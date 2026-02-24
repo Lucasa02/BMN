@@ -57,29 +57,31 @@ class BarangController extends Controller
     {
         $search = $request->input('search');
         $filter = $request->input('filter', 'nama_barang');
-        // Tambahkan variabel untuk menangkap filter ruangan
         $ruangan_filter = $request->input('ruangan_filter');
 
         $list_ruangan = BmnRuangan::orderBy('nama_ruangan', 'asc')->get();
 
         $bmnQuery = BmnBarang::query()
             ->whereDoesntHave('perawatanInventaris', function ($q) {
-                // Cukup filter jenisnya saja, biarkan statusnya apa pun
                 $q->where('jenis_perawatan', 'penghapusan');
             });
-        // Logika Filter Ruangan
+
+        // Filter dari Dropdown Ruangan (Filter Cepat)
         if ($ruangan_filter) {
             $bmnQuery->where('ruangan', $ruangan_filter);
         }
 
-        // Logika Pencarian yang sudah ada
+        // Logika Pencarian Berdasarkan Input Teks
         if ($search) {
             if ($filter == 'nama_barang') {
                 $bmnQuery->where('nama_barang', 'like', '%' . $search . '%');
-            } elseif ($filter == 'ruangan') {
-                $bmnQuery->where('ruangan', 'like', '%' . $search . '%');
             } elseif ($filter == 'kode_barang') {
                 $bmnQuery->where('kode_barang', 'like', '%' . $search . '%');
+            } elseif ($filter == 'kategori') { // Tambahkan filter kategori
+                $bmnQuery->where('kategori', 'like', '%' . $search . '%');
+            } elseif ($filter == 'ruangan') {
+                // Ini akan mencari di kolom 'ruangan' (baik nama Ruangan maupun Unit Kerja/User)
+                $bmnQuery->where('ruangan', 'like', '%' . $search . '%');
             }
         }
 
@@ -89,7 +91,7 @@ class BarangController extends Controller
             'title' => 'Data Barang BMN',
             'barang' => $barang,
             'list_ruangan' => $list_ruangan,
-            'ruangan_filter' => $ruangan_filter, // Kirim status filter kembali ke view
+            'ruangan_filter' => $ruangan_filter,
         ]);
     }
 

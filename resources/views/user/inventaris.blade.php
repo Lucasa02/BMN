@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="csrf-token" content="{{ csrf_token() }}" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <link rel="shortcut icon" href="{{ asset('img/assets/esimprod_logo_bg.png') }}" type="image/x-icon" />
+  <link rel="shortcut icon" href="{{ asset('img/assets/logo_bmn_bg.png') }}" type="image/x-icon" />
   <link href="https://fonts.cdnfonts.com/css/avenir" rel="stylesheet" />
   <title>Inventaris</title>
 
@@ -104,12 +104,22 @@
       animation: modalPop 0.3s ease-out forwards;
     }
 
-    #reader video {
+    #reader {
       border-radius: 12px;
       width: 100% !important;
-      height: auto !important;
-      object-fit: cover;
-      background: transparent !important;
+      /* Hapus height tetap atau sesuaikan agar lebih tinggi */
+      aspect-ratio: 1 / 1; 
+      overflow: hidden;
+      background: #000 !important;
+    }
+
+    /* Tambahkan ini untuk mempercantik tampilan scan region */
+    #reader__scan_region {
+      background: white;
+    }
+
+    #reader video {
+      object-fit: cover !important;
     }
 
     .scanner-card {
@@ -129,7 +139,7 @@
   <div id="loading-animation" class="loading-overlay fixed inset-0">
     <div class="loader-content">
       <span class="logo-container bg-blue-900 p-3 shadow-2xl">
-        <img src="{{ asset('img/assets/esimprod_logo.png') }}" class="h-10" alt="ESIMPROD" />
+        <img src="{{ asset('img/assets/bmn_logo.png') }}" class="h-10" alt="BMN" />
       </span>
       <p class="loader-text font-semibold">Mengalihkan Halaman...</p>
     </div>
@@ -142,10 +152,10 @@
         <div class="flex items-center justify-start rtl:justify-end">
           <p class="flex ms-2 md:me-24">
             <span class="logo-container bg-blue-900 p-1 me-3">
-              <img src="{{ asset('img/assets/esimprod_logo.png') }}" class="h-6 animate-logo" alt="ESIMPROD" />
+              <img src="{{ asset('img/assets/logo_bmn_white.png') }}" class="h-6 animate-logo" alt="BMN" />
             </span>
             <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">
-              <small class="text-xs text-white font-thin">Version 3.0</small>
+              <small class="text-xs text-white font-thin">Version 1.0</small>
             </span>
           </p>
         </div>
@@ -269,7 +279,20 @@
       html5QrCode = new Html5Qrcode("reader");
       scanningActive = true;
 
-      const config = { fps: 12, qrbox: { width: 220, height: 220 } };
+      const config = { 
+        fps: 20, 
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0 
+      };
+
+      const cameraConfig = { 
+        facingMode: "environment",
+        videoConstraints: {
+          width: { min: 640, ideal: 1280 },
+          height: { min: 640, ideal: 720 },
+          facingMode: "environment"
+        }
+      };
 
       html5QrCode.start({ facingMode: "environment" }, config, rawMessage => {
         // 1. Hentikan scanner

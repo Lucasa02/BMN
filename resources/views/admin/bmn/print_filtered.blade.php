@@ -49,6 +49,12 @@
             clear: both;
         }
 
+        .col-nama { 
+        width: 160px; 
+        text-align: left !important; /* Menambahkan rata kiri */
+        padding-left: 8px !important; /* Memberi sedikit jarak dari garis tepi kiri agar lebih rapi */
+    }
+
         /* Styling Table Data & Header */
         .header-table { 
             width: 100%; 
@@ -142,7 +148,7 @@
                 <th class="col-kondisi">Kondisi</th>
                 <th class="col-tgl">Tanggal Perolehan</th>
                 <th class="col-nilai">Nilai Perolehan</th>
-                <th class="col-ruang">Lokasi Ruang</th>
+                <th class="col-ruang">Lokasi</th>
                 <th class="col-ket">Keterangan</th>
             </tr>
         </thead>

@@ -31,10 +31,11 @@ class UserController extends Controller
 
 		$data = [
 			'title' => 'User',
+			// Tambahkan ->where('nama_lengkap', '!=', 'Superadmin')
 			'user' => $query->where('id', '!=', $currentUser->id)
-			->orderBy('nama_lengkap', 'asc')
-			->paginate(10),
-			// 'user' => User::paginate(10)
+				->where('nama_lengkap', '!=', 'Superadmin')
+				->orderBy('nama_lengkap', 'asc')
+				->paginate(10),
 		];
 
 		return view('admin.user.index', $data);
@@ -63,7 +64,6 @@ class UserController extends Controller
 				'email' => 'required|email|unique:users,email',
 				'nomor_hp' => 'required|numeric',
 				'role' => 'required',
-				'jabatan_id' => 'required',
 				'nip' => 'required|numeric|unique:users,nip',
 				'foto' => 'nullable|file|mimes:jpg,jpeg,png',
 			],
@@ -75,13 +75,19 @@ class UserController extends Controller
 				'nomor_hp.required' => 'Nomor HP wajib diisi.',
 				'nomor_hp.numeric' => 'Nomor HP harus berupa angka.',
 				'role.required' => 'Role wajib diisi.',
-				'jabatan_id.required' => 'Jabatan wajib diisi.',
 				'nip.required' => 'NIP wajib diisi.',
 				'nip.numeric' => 'NIP harus berupa angka.',
 				'nip.unique' => 'NIP sudah terdaftar.',
 				'foto.mimes' => 'File harus dalam format jpg, jpeg, png.',
 			]
 		);
+
+		$jabatanPetugas = Jabatan::where('jabatan', 'Petugas Inventaris')->first();
+
+		if (!$jabatanPetugas) {
+			notify()->error('Jabatan Petugas Inventaris tidak ditemukan di database.');
+			return redirect()->back();
+		}
 
 		$kode_user = 'USR' . random_int(1, 999999);
 		$qrCode = QrCode::format('png')->size(200)->generate($kode_user);
@@ -98,7 +104,7 @@ class UserController extends Controller
 			'nama_lengkap' => $request->nama_lengkap,
 			'email' => $request->email,
 			'password' => $password,
-			'jabatan_id' => $request->jabatan_id,
+			'jabatan_id' => $jabatanPetugas->id,
 			'nomor_hp' => $request->nomor_hp,
 			'nip' => $request->nip,
 			'role' => $request->role,
@@ -259,6 +265,7 @@ class UserController extends Controller
 
 		$user = User::where('nama_lengkap', 'like', '%' . $search . '%')
 			->where('id', '!=', $currentUser->id)
+			->where('nama_lengkap', '!=', 'Superadmin')
 			->orderBy('nama_lengkap', 'asc')
 			->paginate(5)
 			->appends(['search' => $search]);

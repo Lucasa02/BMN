@@ -14,7 +14,6 @@ class UserSeeder extends Seeder
 	 */
 	public function run(): void
 	{
-		// User::factory()->count(10)->create();
 
 		User::create([
 			'uuid' => Str::uuid(),
@@ -25,7 +24,7 @@ class UserSeeder extends Seeder
 			'nomor_hp' => '089234898765',
 			'role' => 'superadmin',
 			'jabatan_id' => 3,
-			'password' => Hash::make('password'),
+			'password' => "AdminBMN",
 			'qr_code' => time() . '_qr.png',
 			'foto' => 'default.jpeg',
 			'created_at' => now(),

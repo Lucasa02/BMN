@@ -38,6 +38,16 @@
                                 "{{ $laporan->deskripsi }}"
                             </p>
                         </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Nama Pelapor</label>
+                            <div class="flex items-center gap-2">
+                                <div class="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-xs">
+                                    {{ strtoupper(substr($laporan->user->nama_lengkap ?? 'A', 0, 1)) }}
+                                </div>
+                                <p class="text-sm font-medium text-slate-800">{{ $laporan->user->nama_lengkap ?? 'Tidak diketahui' }}</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex flex-col items-center justify-center">

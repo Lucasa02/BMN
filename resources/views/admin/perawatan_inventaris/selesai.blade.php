@@ -9,17 +9,17 @@
                 transition-all duration-300 hover:shadow-md">
 
         {{-- Header --}}
-        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-            <h2 class="flex items-center gap-2 text-lg font-semibold text-gray-800 dark:text-gray-100">
+        <div class="px-6 py-5 bg-[#1b365d] rounded-t-xl border-b border-white/10">
+            <h2 class="flex items-center gap-2 text-lg font-semibold text-white">
                 {{-- Heroicon: Wrench --}}
-                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="1.8"
-                     viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-blue-200" fill="none" stroke="currentColor" stroke-width="1.8"
+                    viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M14.7 6.3a1 1 0 010 1.4l-8.6 8.6a2 2 0 01-2.8 0l-.6-.6a2 2 0 010-2.8l8.6-8.6a1 1 0 011.4 0z"/>
+                        d="M14.7 6.3a1 1 0 010 1.4l-8.6 8.6a2 2 0 01-2.8 0l-.6-.6a2 2 0 010-2.8l8.6-8.6a1 1 0 011.4 0z"/>
                 </svg>
                 Selesaikan Perbaikan
             </h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p class="text-sm text-blue-100/80 mt-1">
                 Lengkapi data perbaikan sebelum menyelesaikan proses
             </p>
         </div>

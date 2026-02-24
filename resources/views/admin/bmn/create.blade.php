@@ -7,17 +7,33 @@
         <form action="{{ route('bmn.store', $ruangan) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
             @csrf
 
-            {{-- SECTION 1: LOKASI (Hanya jika general) --}}
             @if($ruangan == 'general')
             <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-6">
                 <div class="flex items-center gap-2 mb-4 text-blue-800">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     </svg>
-                    <h3 class="font-bold text-lg">Konfigurasi Lokasi</h3>
+                    <h3 class="font-bold text-lg">Penempatan Barang</h3>
                 </div>
-                <div class="grid grid-cols-1 gap-6"> {{-- Ubah grid ke 1 kolom agar rapi --}}
+
+                <div class="grid grid-cols-1 gap-6">
+                    {{-- Pilihan Tipe Penempatan --}}
                     <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tipe Penempatan <span class="text-red-500">*</span></label>
+                        <div class="flex gap-6 items-center">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="radio" name="tipe_penempatan" value="lokasi" class="w-4 h-4 text-blue-600 focus:ring-blue-500" checked>
+                                <span class="ml-2 text-sm text-gray-700">Ruangan</span>
+                            </label>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="radio" name="tipe_penempatan" value="unit_kerja" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-700">Pengguna</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- Dropdown Lokasi (Default Shown) --}}
+                    <div id="wrapper_lokasi">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Ruangan Utama <span class="text-red-500">*</span></label>
                         <select id="ruangan_select" name="ruangan_pilihan" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 transition-all">
                             <option value="" disabled selected>-- Pilih Lokasi --</option>
@@ -28,6 +44,20 @@
                             @endforeach
                         </select>
                         @error('ruangan_pilihan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Dropdown Unit Kerja (Hidden by Default) --}}
+                    <div id="wrapper_unit_kerja" class="hidden">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Pengguna (Penanggung Jawab) <span class="text-red-500">*</span></label>
+                        <select id="user_select" name="user_id" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 transition-all">
+                            <option value="" disabled selected>-- Pilih User --</option>
+                            @foreach($users as $user)
+                                <option value="{{ $user->nama_lengkap }}" {{ old('user_id') == $user->nama_lengkap ? 'selected' : '' }}>
+                                    {{ $user->nama_lengkap }} ({{ $user->jabatan->jabatan }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('user_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
             </div>
@@ -69,8 +99,14 @@
                         <input type="text" name="kode_barang" value="{{ old('kode_barang') }}" placeholder="Kode BMN" class="w-full border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 p-2.5">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">NUP <span class="text-xs font-normal text-gray-400">(Nomor Urut Pendaftaran)</span></label>
-                        <input type="number" name="nup" value="{{ old('nup') }}" placeholder="0001" class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            NUP <span class="text-xs font-normal text-gray-400">(Nomor Urut Pendaftaran)</span>
+                        </label>
+                        <input type="number" name="nup" value="{{ old('nup') }}" placeholder="0001" 
+                            class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 @error('nup') border-red-500 @enderror">
+                        @error('nup')
+                            <p class="text-red-500 text-xs mt-1">NUP ini sudah digunakan untuk barang dengan nama yang sama.</p>
+                        @enderror
                     </div>
                 </div>
             </div>
@@ -213,6 +249,30 @@ function setupPreview(inputId, previewImgId, containerId, labelId) {
         });
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const radioLokasi = document.querySelectorAll('input[name="tipe_penempatan"]');
+    const wrapperLokasi = document.getElementById('wrapper_lokasi');
+    const wrapperUnitKerja = document.getElementById('wrapper_unit_kerja');
+    const selectRuangan = document.getElementById('ruangan_select');
+    const selectUser = document.getElementById('user_select');
+
+    radioLokasi.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'lokasi') {
+                wrapperLokasi.classList.remove('hidden');
+                wrapperUnitKerja.classList.add('hidden');
+                // Reset value user jika pindah ke lokasi
+                selectUser.value = "";
+            } else {
+                wrapperLokasi.classList.add('hidden');
+                wrapperUnitKerja.classList.remove('hidden');
+                // Reset value ruangan jika pindah ke unit kerja
+                selectRuangan.value = "";
+            }
+        });
+    });
+});
 
 setupPreview('foto', 'photoPreview', 'previewContainer', 'fotoLabel');
 setupPreview('fotoPosisi', 'fotoPosisiPreview', 'posisiPreviewContainer', 'posisiLabel');

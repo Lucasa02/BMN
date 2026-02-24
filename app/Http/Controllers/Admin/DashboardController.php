@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
-use App\Models\Barang;
 use App\Models\Jabatan;
-use App\Models\Peminjaman;
-use App\Models\Peruntukan;
-use App\Models\JenisBarang;
-use App\Models\Pengembalian;
 use App\Models\SliderImage;
+use App\Models\BmnKategori;
+use App\Models\BmnRuangan;
+use App\Models\PerawatanInventaris;
+use App\Models\LaporanKerusakan;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -20,30 +19,27 @@ class DashboardController extends Controller
 		$data['title'] = 'Dashboard';
 		$data['user'] = User::count();
 		$data['slider_images'] = SliderImage::all();
-		$data['barang'] = Barang::count();
-		$data['peruntukan'] = Peruntukan::count();
-		$data['jenis_barang'] = JenisBarang::count();
 		$data['jabatan'] = Jabatan::count();
-		$data['barang_tersedia'] = Barang::where('status', 'tersedia')->count();
+		$data['bmn_kategori'] = BmnKategori::count();
+		$data['bmn_ruangan'] = BmnRuangan::count();
 
-		$data['barang_hilang'] = Barang::where('status', 'tidak-tersedia')
-			->whereHas('detail_pengembalian', function ($query) {
-				$query->where('status', 'hilang');
-			})->count();
+		// --- DATA BARANG BMN ---
+		$data['barang'] = \App\Models\BmnBarang::count();
+		$data['barang_tersedia'] = \App\Models\BmnBarang::whereIn('kondisi', ['Sangat Baik', 'Baik'])->count();
+		$data['barang_rusak'] = \App\Models\BmnBarang::where('kondisi', 'Rusak / Cacat')->count();
+		$data['barang_kurang_baik'] = \App\Models\BmnBarang::where('kondisi', 'Kurang Baik')->count();
 
-		$data['barang_tidak_tersedia'] = Barang::where('status', 'tidak-tersedia')
-			->where('sisa_limit', 0)
-			->whereHas('detail_pengembalian', function ($query) {
-				$query->where('status', '!=', 'hilang');
-			})->count();
+		// --- DATA PERAWATAN INVENTARIS ---
+		$data['perawatan'] = PerawatanInventaris::where('status', '!=', 'selesai')->count();
+		$data['perawatan_pending'] = PerawatanInventaris::where('status', 'pending')->count();
+		$data['perawatan_proses'] = PerawatanInventaris::where('status', 'proses')->count();
 
-
-		$data['peminjaman'] = Peminjaman::count();
-		$data['peminjaman_proses'] = Peminjaman::where('status', 'Proses')->count();
-		$data['peminjaman_selesai'] = Peminjaman::where('status', 'Selesai')->count();
-		$data['pengembalian'] = Pengembalian::count();
-		$data['pengembalian_incomplete'] = Pengembalian::where('status', 'Tidak Lengkap')->groupBy('kode_peminjaman')->count();
-		$data['pengembalian_complete'] = Pengembalian::where('status', 'Lengkap')->groupBy('kode_peminjaman')->count();
+		// --- PERUBAHAN DATA PENGEMBALIAN KE LAPORAN KERUSAKAN ---
+		$data['laporan_total'] = LaporanKerusakan::count();
+		$data['laporan_pending'] = LaporanKerusakan::where('status', 'pending')->count();
+		$data['laporan_disetujui'] = LaporanKerusakan::where('status', 'disetujui')->count();
+		$data['laporan_ditolak'] = LaporanKerusakan::where('status', 'ditolak')->count();
+		// -------------------------------------------------------
 
 		return view('admin.dashboard.index', $data);
 	}

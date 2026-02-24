@@ -82,10 +82,15 @@
               <li><a href="{{ route('profil.index') }}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fa-solid fa-user-gear mr-3"></i> My Profile</a></li>
               <li><hr class="my-1 border-gray-100"></li>
               <li>
-                <a href="#" onclick="event.preventDefault(); document.getElementById('logout').submit();" class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+                  class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
                   <i class="fa-solid fa-arrow-right-from-bracket mr-3"></i> Sign Out
                 </a>
               </li>
+
+              <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                  @csrf
+              </form>
             </ul>
           </div>
         </div>

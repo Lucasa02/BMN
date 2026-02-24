@@ -64,6 +64,10 @@
         <h3 class="font-bold text-gray-900 dark:text-white text-base truncate mb-1">
             {{ $l->barang->nama_barang }}
         </h3>
+        <p class="text-[10px] text-slate-400 uppercase font-semibold mb-1">
+            {{-- Ubah $l->user->name menjadi $l->user->nama_lengkap --}}
+            Pelapor: <span class="text-slate-600 dark:text-slate-300">{{ $l->user->nama_lengkap ?? 'Anonim' }}</span>
+        </p>
         <p class="text-xs text-red-500 font-medium mb-2 italic">
             ⚠ {{ $l->jenis_kerusakan }}
         </p>

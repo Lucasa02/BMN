@@ -12,8 +12,8 @@ class LaporanKerusakanAdminController extends Controller
 {
     public function index()
     {
-        // Tambahkan with('barang') di sini
-        $laporan = LaporanKerusakan::with('barang')
+        // Tambahkan with(['barang', 'user'])
+        $laporan = LaporanKerusakan::with(['barang', 'user'])
             ->where('status', 'pending')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -25,7 +25,7 @@ class LaporanKerusakanAdminController extends Controller
 
     public function detail($uuid)
     {
-        $laporan = LaporanKerusakan::with('barang')->where('uuid', $uuid)->firstOrFail();
+        $laporan = LaporanKerusakan::with(['barang', 'user'])->where('uuid', $uuid)->firstOrFail();
         $title = "Laporan Kerusakan";
         return view('admin.laporan_kerusakan.detail', compact('laporan', 'title'));
     }
@@ -34,20 +34,17 @@ class LaporanKerusakanAdminController extends Controller
     {
         $laporan = LaporanKerusakan::where('uuid', $uuid)->firstOrFail();
 
-        // MASUKKAN KE PERAWATAN INVENTARIS
         PerawatanInventaris::create([
             'barang_id'         => $laporan->barang_id,
-            'tanggal_perawatan' => now(), // Sertakan tanggal sekarang
+            'tanggal_perawatan' => now(),
             'jenis_perawatan'   => 'perbaikan',
             'deskripsi'         => $laporan->deskripsi,
             'foto_kerusakan'    => $laporan->foto,
             'status'            => 'pending'
         ]);
 
-        // Update status laporan asal
         $laporan->update(['status' => 'disetujui']);
 
-        // Redirect ke halaman index perawatan inventaris
         return redirect()->route('perawatan_inventaris.index')
             ->with('success', 'Laporan disetujui dan berhasil dipindahkan ke daftar Perawatan.');
     }
@@ -58,13 +55,14 @@ class LaporanKerusakanAdminController extends Controller
             'status' => 'ditolak'
         ]);
 
-        return redirect()->back()->with('success', 'Laporan ditolak.');
+        return redirect()->route('admin.laporan-kerusakan.index')
+            ->with('success', 'Laporan telah ditolak dan dihapus dari daftar antrean.');
     }
 
     public function exportPDF()
     {
-        // Tambahkan with('barang') di sini juga agar PDF tidak error
-        $laporan = LaporanKerusakan::with('barang')
+        // Tambahkan 'user' di dalam with()
+        $laporan = LaporanKerusakan::with(['barang', 'user'])
             ->where('status', 'pending')
             ->orderBy('created_at', 'desc')
             ->get();

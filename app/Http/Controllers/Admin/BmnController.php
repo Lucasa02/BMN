@@ -15,6 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Validation\Rule;
 use App\Models\PerawatanInventaris;
 class BmnController extends Controller
 {
@@ -236,9 +237,13 @@ class BmnController extends Controller
 
     public function create($ruangan)
     {
-        // Mengambil semua data ruangan dan kategori dari database
         $ruangans = BmnRuangan::orderBy('nama_ruangan', 'asc')->get();
         $kategoris = BmnKategori::orderBy('nama_kategori', 'asc')->get();
+
+        // Tambahkan whereNotIn untuk mengecualikan nama tertentu
+        $users = \App\Models\User::whereNotIn('nama_lengkap', ['Superadmin', 'SuperAdminBMN'])
+            ->orderBy('nama_lengkap', 'asc')
+            ->get();
 
         if ($ruangan == 'general') {
             $title = 'Tambah Barang BMN';
@@ -246,23 +251,26 @@ class BmnController extends Controller
             $title = 'Tambah Barang - ' . ucfirst($ruangan);
         }
 
-        // Kirim data ke view
-        return view('admin.bmn.create', compact('ruangan', 'title', 'ruangans', 'kategoris'));
+        return view('admin.bmn.create', compact('ruangan', 'title', 'ruangans', 'kategoris', 'users'));
     }
 
     public function store(Request $request, $ruangan)
     {
         $rules = [
             'nama_barang'        => 'required',
-            'nup'                => 'required|string|max:255|unique:bmn_barangs',
+            'nup'                => ['required','string','max:255',
+                Rule::unique('bmn_barangs')->where(function ($query) use ($request) {
+                    return $query->where('nama_barang', $request->nama_barang);
+                }),],
             'kode_barang'        => 'nullable|string|max:255|unique:bmn_barangs',
             'kategori'           => 'required',
+            'tipe_penempatan'    => 'required|in:lokasi,unit_kerja',
             'merk'               => 'nullable',
             'nomor_seri'         => 'nullable',
             'jumlah'             => 'required|integer|min:1',
             'persentase_kondisi' => 'required|numeric|min:0|max:100',
-            'tanggal_perolehan'  => 'nullable|date', // Diubah dari tahun_pengadaan (digits:4)
-            'nilai_perolehan'    => 'nullable|numeric|min:0', // Field baru
+            'tanggal_perolehan'  => 'nullable|date',
+            'nilai_perolehan'    => 'nullable|numeric|min:0',
             'asal_pengadaan'     => 'nullable',
             'catatan'            => 'nullable',
             'foto'               => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -270,14 +278,21 @@ class BmnController extends Controller
         ];
 
         if ($ruangan == 'general') {
-            $rules['ruangan_pilihan'] = 'required|exists:bmn_ruangans,nama_ruangan';
+            if ($request->tipe_penempatan == 'lokasi') {
+                $rules['ruangan_pilihan'] = 'required|exists:bmn_ruangans,nama_ruangan';
+            } else {
+                $rules['user_id'] = 'required'; // Mengambil nama user
+            }
         }
 
         $validated = $request->validate($rules);
 
         // LOGIKA LOKASI DISERDAHANAKAN
         if ($ruangan == 'general') {
-            $finalRuangan = $validated['ruangan_pilihan'];
+            // Jika tipe lokasi, ambil dari select ruangan, jika unit_kerja, ambil dari select user
+            $finalRuangan = ($request->tipe_penempatan == 'lokasi')
+                ? $request->ruangan_pilihan
+                : $request->user_id;
         } else {
             $finalRuangan = ucfirst($ruangan);
         }
@@ -361,22 +376,42 @@ class BmnController extends Controller
     {
         $barang = BmnBarang::findOrFail($id);
 
-        $validated = $request->validate([
+        // 1. Definisikan Rules Dasar
+        $rules = [
             'nama_barang'        => 'required',
-            'nup'                => 'required|string|max:255|unique:bmn_barangs,nup,' . $barang->id,
+            'nup'                => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('bmn_barangs')->where(function ($query) use ($request) {
+                    return $query->where('nama_barang', $request->nama_barang);
+                })->ignore($barang->id),
+            ],
             'kode_barang'        => 'required|string|max:255|unique:bmn_barangs,kode_barang,' . $barang->id,
             'kategori'           => 'required',
             'jumlah'             => 'required|integer|min:1',
             'persentase_kondisi' => 'required|numeric|min:0|max:100',
-            'tanggal_perolehan'  => 'nullable|date', // Tambahkan ini
-            'nilai_perolehan'    => 'nullable|numeric|min:0', // Tambahkan ini
-            'ruangan_pilihan'    => 'required',
+            'tanggal_perolehan'  => 'nullable|date',
+            'nilai_perolehan'    => 'nullable|numeric|min:0',
+            'tipe_penempatan'    => 'required|in:lokasi,unit_kerja', // Tambahkan validasi tipe
             'foto'               => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'posisi'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+        ];
 
-        // LANGSUNG AMBIL DARI PILIHAN
-        $validated['ruangan'] = $request->ruangan_pilihan;
+        // 2. Validasi Kondisional berdasarkan Tipe Penempatan
+        if ($request->tipe_penempatan == 'lokasi') {
+            $rules['ruangan_pilihan'] = 'required|exists:bmn_ruangans,nama_ruangan';
+        } else {
+            $rules['user_id'] = 'required'; // Mengambil nama user/unit kerja
+        }
+
+        $validated = $request->validate($rules);
+
+        // 3. Tentukan nilai akhir kolom 'ruangan' di database
+        $validated['ruangan'] = ($request->tipe_penempatan == 'lokasi')
+            ? $request->ruangan_pilihan
+            : $request->user_id;
+
         $validated['kondisi'] = $this->tentukanKondisi($validated['persentase_kondisi']);
 
         $manager = new ImageManager(new Driver());
@@ -397,7 +432,7 @@ class BmnController extends Controller
             $validated['foto'] = $path;
         }
 
-        // UPDATE FOTO POSISI (kolom: posisi)
+        // UPDATE FOTO POSISI
         if ($request->hasFile('posisi')) {
             if ($barang->posisi) Storage::disk('public')->delete($barang->posisi);
 
@@ -412,19 +447,25 @@ class BmnController extends Controller
 
             $validated['posisi'] = $path;
         }
+
+        // UPDATE QR CODE (jika ada perubahan kode barang atau media)
         if ($request->hasFile('foto') || $request->hasFile('posisi') || $request->kode_barang !== $barang->kode_barang) {
+            if ($barang->qr_code) Storage::disk('public')->delete($barang->qr_code);
 
-        if ($barang->qr_code) Storage::disk('public')->delete($barang->qr_code);
+            $qrName = 'qr_' . $validated['kode_barang'] . '.png';
+            $qrPath = 'bmn/qrcode/' . $qrName;
+            $scanUrl = route('user.inventaris.scan', $validated['kode_barang']);
 
-        $qrName = 'qr_' . $validated['kode_barang'] . '.png';
-        $qrPath = 'bmn/qrcode/' . $qrName;
-        $scanUrl = route('user.inventaris.scan', $validated['kode_barang']);
+            QrCode::format('png')->size(300)->margin(2)
+                ->generate($scanUrl, Storage::disk('public')->path($qrPath));
 
-        QrCode::format('png')->size(300)->margin(2)
-            ->generate($scanUrl, Storage::disk('public')->path($qrPath));
+            $validated['qr_code'] = $qrPath;
+        }
 
-        $validated['qr_code'] = $qrPath;
-    }
+        // 4. Update Data (Hapus key tambahan agar tidak error saat update ke model)
+        unset($validated['ruangan_pilihan']);
+        unset($validated['user_id']);
+        unset($validated['tipe_penempatan']);
 
         $barang->update($validated);
 

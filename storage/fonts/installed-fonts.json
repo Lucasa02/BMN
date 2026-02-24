@@ -1,15 +1,15 @@
 {
     "poppins": {
         "normal": "D:\\laragon\\www\\esimprod2.0\\storage\\fonts\/poppins_normal_16246dd83ca984bde432c3105fd17106",
-        "bold": "poppins_bold_899a7444fa6cdc7fd5fa50b9d2e302f0"
+        "bold": "poppins_bold_eb629b930b9137c07af69e6a6daf94e3"
     },
     "poppinsregular": {
         "normal": "poppinsregular_normal_16246dd83ca984bde432c3105fd17106"
     },
     "poppins-regular": {
-        "normal": "poppins_regular_normal_0a645d0eaca1b7e54e2b4c9692f00462"
+        "normal": "poppins_regular_normal_b6de0e1ece0ad7ed24ad65a403329bfa"
     },
     "gotham black": {
-        "bold": "gotham_black_bold_12134fa3ec4310b08bdfd82d35c58e69"
+        "bold": "gotham_black_bold_a92d71d5b0f98f343bbd1298b674b4cc"
     }
 }

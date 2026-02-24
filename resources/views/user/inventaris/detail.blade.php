@@ -66,6 +66,12 @@
 <body class="font-display bg-background-light min-h-screen text-slate-900">
 
 <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+    @if (session('success'))
+    <div class="mb-6 animate-premium p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-700 shadow-sm">
+        <span class="material-symbols-outlined text-green-500">check_circle</span>
+        <p class="text-sm font-bold">{{ session('success') }}</p>
+    </div>
+@endif
     
     {{-- Header --}}
     <header class="flex flex-col sm:flex-row justify-between items-center gap-6 animate-premium">
@@ -98,7 +104,7 @@
         <a href="{{ route('user.inventaris.lapor-kerusakan.form', $barang->id) }}"
             class="group flex items-center justify-center gap-2 rounded-xl h-11 px-6 bg-red-600 text-white text-sm font-bold hover:bg-red-700 hover:shadow-lg hover:shadow-red-200 transition-all duration-300 transform active:scale-95">
             <span class="material-symbols-outlined text-base group-hover:rotate-12 transition-transform">report_problem</span>
-            <span>Laporkan Kerusakan</span>
+            <span>Laporkan Kondisi Barang</span>
         </a>
     </div>
 </header>

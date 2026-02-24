@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,5 +24,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::preventLazyLoading();
         Paginator::useTailwind();
+        if (str_contains(request()->url(), 'ngrok-free.app')) {
+            URL::forceScheme('https');
+        }
     }
 }
