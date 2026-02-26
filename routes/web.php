@@ -230,6 +230,15 @@ Route::middleware(['auth'])->group(function () {
 				Route::delete('/destroy/{uuid}', [BmnController::class, 'jenisKerusakanDestroy'])->name('bmn.jenis_kerusakan.destroy');
 				Route::get('/search', [BmnController::class, 'jenisKerusakanSearch'])->name('bmn.jenis_kerusakan.search');
 			});
+
+      Route::prefix('pengguna')->group(function () {
+        Route::get('/', [BmnController::class, 'penggunaIndex'])->name('bmn.pengguna.index');
+        Route::post('/store', [BmnController::class, 'penggunaStore'])->name('bmn.pengguna.store');
+        Route::get('/edit/{uuid}', [BmnController::class, 'penggunaEdit'])->name('bmn.pengguna.edit');
+        Route::put('/update/{uuid}', [BmnController::class, 'penggunaUpdate'])->name('bmn.pengguna.update');
+        Route::delete('/destroy/{uuid}', [BmnController::class, 'penggunaDestroy'])->name('bmn.pengguna.destroy');
+        Route::get('/search', [BmnController::class, 'penggunaSearch'])->name('bmn.pengguna.search');
+      });
 			// --- END ROUTES BARU ---
 
 			Route::get('/qr-all/download', [BmnController::class, 'downloadQRAll'])->name('bmn.qr_all.download');

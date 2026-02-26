@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BmnBarang;
 use App\Models\BmnRuangan;
 use App\Models\BmnKategori;
+use App\Models\Pengguna;
 use App\Models\BmnJenisKerusakan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -197,6 +198,63 @@ class BmnController extends Controller
             ->paginate(10);
         $title = 'Hasil Pencarian Jenis Kerusakan';
         return view('admin.bmn.jenis_kerusakan.index', compact('jenis_kerusakan', 'title'));
+    }
+
+    public function penggunaIndex()
+    {
+        $pengguna = Pengguna::orderBy('nama', 'asc')->paginate(10);
+        $title = 'Daftar Pengguna BMN';
+        return view('admin.bmn.pengguna.index', compact('pengguna', 'title'));
+    }
+
+    public function penggunaStore(Request $request)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'nip'  => 'required|string|unique:penggunas,nip|max:50',
+        ]);
+
+        $validated['uuid'] = Str::uuid();
+        Pengguna::create($validated);
+
+        return redirect()->back()->with('success', 'Pengguna berhasil ditambahkan.');
+    }
+
+    public function penggunaEdit($uuid)
+    {
+        $pengguna = Pengguna::where('uuid', $uuid)->firstOrFail();
+        return response()->json($pengguna);
+    }
+
+    public function penggunaUpdate(Request $request, $uuid)
+    {
+        $pengguna = Pengguna::where('uuid', $uuid)->firstOrFail();
+
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'nip'  => 'required|string|max:50|unique:penggunas,nip,' . $pengguna->id,
+        ]);
+
+        $pengguna->update($validated);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function penggunaDestroy($uuid)
+    {
+        Pengguna::where('uuid', $uuid)->delete();
+        return redirect()->back()->with('success', 'Data pengguna berhasil dihapus.');
+    }
+
+    public function penggunaSearch(Request $request)
+    {
+        $keyword = $request->search;
+        $pengguna = Pengguna::where('nama', 'like', "%{$keyword}%")
+            ->orWhere('nip', 'like', "%{$keyword}%")
+            ->paginate(10);
+
+        $title = 'Hasil Pencarian Pengguna';
+        return view('admin.bmn.pengguna.index', compact('pengguna', 'title'));
     }
 
     public function index(Request $request, $ruangan)

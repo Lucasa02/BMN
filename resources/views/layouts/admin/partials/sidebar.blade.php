@@ -80,8 +80,9 @@
                         id="arrow-bmn"></i>
                 </button>
 
+                {{-- Hapus users.* dari pengecekan routeIs di bawah ini --}}
                 <ul id="dropdown-bmn"
-                    class="{{ request()->routeIs('barang.bmn_index', 'bmn.ruangan.*', 'bmn.kategori.*', 'bmn.jenis_kerusakan.*', 'jabatan.*', 'users.*') ? 'block' : 'hidden' }} py-2 space-y-1 ml-4 border-l border-white/10 mt-1">
+                    class="{{ request()->routeIs('barang.bmn_index', 'bmn.ruangan.*', 'bmn.kategori.*', 'bmn.jenis_kerusakan.*', 'jabatan.*') ? 'block' : 'hidden' }} py-2 space-y-1 ml-4 border-l border-white/10 mt-1">
                     <li>
                         <a href="{{ route('barang.bmn_index') }}"
                             class="flex items-center p-2 pl-6 rounded-lg text-xs {{ request()->routeIs('barang.bmn_index') ? 'text-white font-bold' : 'text-white/60 hover:text-white' }}">
@@ -101,15 +102,15 @@
                         </a>
                     </li>
                     <li>
+            <a href="{{ route('bmn.pengguna.index') }}"
+                class="flex items-center p-2 pl-6 rounded-lg text-xs {{ request()->routeIs('bmn.pengguna.*') ? 'text-white font-bold' : 'text-white/60 hover:text-white' }}">
+                <i class="fa-solid fa-user-tag w-4 text-purple-400 mr-3"></i> Pengguna BMN
+            </a>
+        </li>
+                    <li>
                         <a href="{{ route('bmn.jenis_kerusakan.index') }}"
                             class="flex items-center p-2 pl-6 rounded-lg text-xs {{ request()->routeIs('bmn.jenis_kerusakan.*') ? 'text-white font-bold' : 'text-white/60 hover:text-white' }}">
                             <i class="fa-solid fa-triangle-exclamation w-4 text-red-400 mr-3"></i> Jenis Kerusakan
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('users.index') }}"
-                            class="flex items-center p-2 pl-6 rounded-lg text-xs {{ request()->routeIs('users.*') ? 'text-white font-bold' : 'text-white/60 hover:text-white' }}">
-                            <i class="fa-solid fa-user-group w-4 text-cyan-400 mr-3"></i> Pengguna
                         </a>
                     </li>
                 </ul>
@@ -162,6 +163,25 @@
                         </a>
                     </li>
                 </ul>
+            </li>
+
+            {{-- === USER SECTION === --}}
+            <li class="pt-4 pb-2">
+                <div class="flex items-center px-3">
+                    <span class="text-[10px] font-bold tracking-[2px] text-white/40 uppercase">User</span>
+                </div>
+            </li>
+
+            {{-- Pengguna --}}
+            <li>
+                <a href="{{ route('users.index') }}"
+                    class="nav-item flex items-center p-2.5 rounded-xl transition-all {{ request()->routeIs('users.*') ? $activeClass : $inactiveClass }}">
+                    <div
+                        class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('users.*') ? 'bg-blue-500' : 'bg-white/5' }} mr-1">
+                        <i class="fa-solid fa-user-gear text-sm"></i>
+                    </div>
+                    <span class="ms-2 text-sm font-medium">Data Pengguna</span>
+                </a>
             </li>
 
             {{-- === LAINNYA === --}}
