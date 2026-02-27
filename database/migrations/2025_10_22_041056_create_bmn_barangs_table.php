@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer('jumlah');
             $table->integer('persentase_kondisi')->nullable();
             $table->string('kondisi')->nullable();
+            $table->string('unit_kerja')->nullable();
             $table->string('foto')->nullable();
             $table->string('ruangan');
             $table->string('posisi')->nullable(); // ✅ Tambahan posisi rak/meja

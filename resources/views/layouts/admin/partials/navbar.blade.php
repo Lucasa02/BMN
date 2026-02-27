@@ -53,11 +53,11 @@
 
         <a href="{{ route('dashboard.index') }}" class="flex items-center group">
           <div class="logo-container">
-            <img src="{{ asset('img/assets/bmn_logo.png') }}" class="h-8 transition-transform group-hover:scale-110" alt="Logo" />
+            <img src="{{ asset('img/assets/logo_esimba_white.png') }}" class="h-8 transition-transform group-hover:scale-110" alt="Logo" />
           </div>
           <div class="flex flex-col ms-3">
-            <span class="text-lg font-bold tracking-wider text-white uppercase">INVENTARA</span>
-            <span class="text-[10px] text-blue-200 font-medium -mt-1 tracking-widest uppercase">Management System v1.0</span>
+            <span class="text-lg font-bold tracking-wider text-white uppercase">ESIMBA</span>
+            <span class="text-[10px] text-blue-200 font-medium -mt-1 tracking-widest uppercase">Sistem Informasi Barang Milik Negara v1.0</span>
           </div>
         </a>
       </div>
@@ -69,7 +69,7 @@
                <p class="text-xs font-semibold text-white leading-none">{{ Auth::user()->nama_lengkap }}</p>
                <p class="text-[10px] text-blue-200 opacity-80 uppercase tracking-tighter">Administrator</p>
             </div>
-            <img class="w-9 h-9 rounded-full border-2 border-white/50 shadow-sm" 
+            <img class="w-9 h-9 rounded-full border-2 border-white/50 shadow-sm"
                  src="{{ Auth::user()->foto ? asset('storage/uploads/foto_user/' . Auth::user()->foto) : Avatar::create(Auth::user()->nama_lengkap)->toBase64() }}">
           </button>
 
@@ -82,7 +82,7 @@
               <li><a href="{{ route('profil.index') }}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fa-solid fa-user-gear mr-3"></i> My Profile</a></li>
               <li><hr class="my-1 border-gray-100"></li>
               <li>
-                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                   class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
                   <i class="fa-solid fa-arrow-right-from-bracket mr-3"></i> Sign Out
                 </a>

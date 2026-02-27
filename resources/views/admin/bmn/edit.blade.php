@@ -8,16 +8,38 @@
             @csrf
             @method('PUT')
 
-            {{-- SECTION 1: LOKASI --}}
-            <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-6 shadow-sm">
-                <div class="flex items-center gap-2 mb-4 text-blue-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            {{-- SECTION 1: PENEMPATAN & LOKASI --}}
+            <div class="bg-white shadow-sm border rounded-xl overflow-hidden">
+                <div class="bg-gray-50 px-6 py-4 border-b flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     </svg>
-                    <h3 class="font-bold text-lg">Konfigurasi Lokasi</h3>
+                    <h3 class="font-bold text-gray-800">Penempatan Barang</h3>
                 </div>
-                <div class="grid grid-cols-1 gap-6">
+
+                <div class="p-6 grid grid-cols-1 gap-6">
+                    {{-- 1. PILIHAN TIPE PENEMPATAN --}}
                     <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tipe Penempatan <span class="text-red-500">*</span></label>
+                        <div class="flex gap-6 items-center">
+                            @php
+                                // Logika sederhana untuk menentukan tipe penempatan saat ini
+                                $isPengguna = $penggunas->contains('nama', $barang->ruangan);
+                                $currentTipe = $isPengguna ? 'pengguna' : 'lokasi';
+                            @endphp
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="radio" name="tipe_penempatan" value="lokasi" class="w-4 h-4 text-blue-600 focus:ring-blue-500" {{ old('tipe_penempatan', $currentTipe) == 'lokasi' ? 'checked' : '' }}>
+                                <span class="ml-2 text-sm text-gray-700">Ruangan</span>
+                            </label>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="radio" name="tipe_penempatan" value="pengguna" class="w-4 h-4 text-blue-600 focus:ring-blue-500" {{ old('tipe_penempatan', $currentTipe) == 'pengguna' ? 'checked' : '' }}>
+                                <span class="ml-2 text-sm text-gray-700">Pengguna</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- 2. DROPDOWN SPESIFIK (Lokasi atau Pengguna) --}}
+                    <div id="wrapper_lokasi" class="hidden animate-fade-in-down">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Ruangan Utama <span class="text-red-500">*</span></label>
                         <select id="ruangan_select" name="ruangan_pilihan" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 transition-all">
                             <option value="" disabled>-- Pilih Lokasi --</option>
@@ -29,10 +51,37 @@
                         </select>
                         @error('ruangan_pilihan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
+
+                    <div id="wrapper_pengguna" class="hidden animate-fade-in-down">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Pengguna (Penanggung Jawab) <span class="text-red-500">*</span></label>
+                        <select id="user_select" name="user_id" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 transition-all">
+                            <option value="" disabled>-- Pilih Pengguna --</option>
+                            @foreach($penggunas as $p)
+                                <option value="{{ $p->nama }}" {{ old('user_id', $barang->ruangan) == $p->nama ? 'selected' : '' }}>
+                                    {{ $p->nama }} (NIP: {{ $p->nip }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('user_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- 3. DROPDOWN UNIT KERJA TERKAIT --}}
+                    <div id="wrapper_unit_kerja" class="animate-fade-in-down pt-4 border-t border-gray-100">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Unit Kerja Terkait <span class="text-red-500">*</span></label>
+                        <select id="unit_kerja_select" name="unit_kerja_pilihan" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 transition-all">
+                            <option value="" disabled>-- Pilih Unit Kerja --</option>
+                            @foreach($unit_kerjas as $uk)
+                                <option value="{{ $uk->nama_unit_kerja }}" {{ old('unit_kerja_pilihan', $barang->unit_kerja) == $uk->nama_unit_kerja ? 'selected' : '' }}>
+                                    {{ $uk->nama_unit_kerja }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('unit_kerja_pilihan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
                 </div>
             </div>
 
-            {{-- SECTION 2: INFORMASI DASAR --}}
+            {{-- SECTION 2: INFORMASI DASAR & IDENTITAS --}}
             <div class="bg-white shadow-sm border rounded-xl overflow-hidden">
                 <div class="bg-gray-50 px-6 py-4 border-b">
                     <h3 class="font-bold text-gray-800">Informasi Dasar & Identitas</h3>
@@ -41,7 +90,6 @@
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Barang <span class="text-red-500">*</span></label>
                         <input type="text" name="nama_barang" value="{{ old('nama_barang', $barang->nama_barang) }}" class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" required>
-                        @error('nama_barang') <small class="text-red-500">{{ $message }}</small> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
@@ -52,7 +100,6 @@
                                 </option>
                             @endforeach
                         </select>
-                        @error('kategori') <small class="text-red-500">{{ $message }}</small> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor Seri (S/N)</label>
@@ -115,33 +162,31 @@
                     <span class="text-xs text-gray-400">Format: JPG, PNG (Max 2MB)</span>
                 </div>
                 <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {{-- Foto Fisik --}}
                     <div class="space-y-3">
                         <label class="block text-sm font-semibold text-gray-700">Foto Fisik Barang</label>
                         <div class="group relative border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-blue-400 transition-all text-center">
                             <input type="file" name="foto" id="foto" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                            <div id="previewContainer" class="{{ $barang->foto ? '' : 'hidden' }} mb-2 flex justify-center">
+                            <div id="previewContainer" class="{{ $barang->foto ? 'flex' : 'hidden' }} mb-2 justify-center">
                                 <img id="photoPreview" src="{{ $barang->foto ? asset('storage/'.$barang->foto) : '' }}" class="h-32 w-48 object-cover rounded-lg shadow-md border">
                             </div>
                             <div class="text-gray-500 {{ $barang->foto ? 'hidden' : '' }}" id="fotoLabel">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-8 w-8 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-8 w-8 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                 <p class="text-sm">Klik untuk ganti foto fisik</p>
                             </div>
                         </div>
                     </div>
 
+                    {{-- Foto Posisi --}}
                     <div class="space-y-3">
                         <label class="block text-sm font-semibold text-gray-700">Foto Posisi Terpasang</label>
                         <div class="group relative border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-blue-400 transition-all text-center">
                             <input type="file" name="posisi" id="fotoPosisi" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                            <div id="posisiPreviewContainer" class="{{ $barang->posisi ? '' : 'hidden' }} mb-2 flex justify-center">
+                            <div id="posisiPreviewContainer" class="{{ $barang->posisi ? 'flex' : 'hidden' }} mb-2 justify-center">
                                 <img id="fotoPosisiPreview" src="{{ $barang->posisi ? asset('storage/'.$barang->posisi) : '' }}" class="h-32 w-48 object-cover rounded-lg shadow-md border">
                             </div>
                             <div class="text-gray-500 {{ $barang->posisi ? 'hidden' : '' }}" id="posisiLabel">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-8 w-8 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-8 w-8 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                 <p class="text-sm">Klik untuk ganti foto posisi</p>
                             </div>
                         </div>
@@ -151,18 +196,14 @@
 
             {{-- SECTION 5: CATATAN --}}
             <div class="bg-white shadow-sm border rounded-xl p-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 text-lg">Catatan Tambahan</label>
+                <label class="block font-semibold text-gray-700 mb-2 text-lg">Catatan Tambahan</label>
                 <textarea name="catatan" rows="3" class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5">{{ old('catatan', $barang->catatan) }}</textarea>
             </div>
 
             {{-- ACTION BUTTONS --}}
             <div class="flex flex-col-reverse md:flex-row gap-4 justify-end pt-6 border-t">
-                <a href="{{ route('barang.bmn_index') }}" class="inline-flex justify-center items-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
-                    Batal
-                </a>
-                <button type="submit" class="inline-flex justify-center items-center px-10 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-blue-600 hover:bg-blue-700 shadow-lg transition-all">
-                    Simpan Perubahan
-                </button>
+                <a href="{{ route('barang.bmn_index') }}" class="inline-flex justify-center items-center px-6 py-3 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">Batal</a>
+                <button type="submit" class="inline-flex justify-center items-center px-10 py-3 text-sm font-bold rounded-lg text-white bg-blue-600 hover:bg-blue-700 shadow-lg transition-all">Simpan Perubahan</button>
             </div>
         </form>
     </div>
@@ -182,7 +223,7 @@ function setupPreview(inputId, previewImgId, containerId, labelId) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById(previewImgId).src = e.target.result;
-                    if(container) container.classList.remove('hidden');
+                    if(container) { container.classList.remove('hidden'); container.classList.add('flex'); }
                     if(label) label.classList.add('hidden');
                 };
                 reader.readAsDataURL(file);
@@ -191,7 +232,39 @@ function setupPreview(inputId, previewImgId, containerId, labelId) {
     }
 }
 
-setupPreview('foto', 'photoPreview', 'previewContainer', 'fotoLabel');
-setupPreview('fotoPosisi', 'fotoPosisiPreview', 'posisiPreviewContainer', 'posisiLabel');
+document.addEventListener('DOMContentLoaded', function() {
+    const radioTipe = document.querySelectorAll('input[name="tipe_penempatan"]');
+    const wrapperLokasi = document.getElementById('wrapper_lokasi');
+    const wrapperPengguna = document.getElementById('wrapper_pengguna');
+
+    function toggleFields(selectedValue) {
+        if (!selectedValue) return;
+
+        wrapperLokasi.classList.add('hidden');
+        wrapperPengguna.classList.add('hidden');
+
+        if (selectedValue === 'lokasi') {
+            wrapperLokasi.classList.remove('hidden');
+        } else if (selectedValue === 'pengguna') {
+            wrapperPengguna.classList.remove('hidden');
+        }
+    }
+
+    radioTipe.forEach(radio => {
+        radio.addEventListener('change', function() { toggleFields(this.value); });
+    });
+
+    // Inisialisasi tampilan awal berdasarkan nilai yang terpilih
+    const activeRadio = document.querySelector('input[name="tipe_penempatan"]:checked');
+    if (activeRadio) toggleFields(activeRadio.value);
+
+    setupPreview('foto', 'photoPreview', 'previewContainer', 'fotoLabel');
+    setupPreview('fotoPosisi', 'fotoPosisiPreview', 'posisiPreviewContainer', 'posisiLabel');
+});
 </script>
+
+<style>
+    .animate-fade-in-down { animation: fadeInDown 0.3s ease-out; }
+    @keyframes fadeInDown { 0% { opacity: 0; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
+</style>
 @endsection

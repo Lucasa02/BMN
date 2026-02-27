@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Barang;
 use App\Models\BmnBarang;
 use App\Models\BmnRuangan;
+use App\Models\BmnKategori;
+use App\Models\UnitKerja;
 use App\Models\JenisBarang;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -54,46 +56,55 @@ class BarangController extends Controller
     }
 
     public function bmnIndex(Request $request)
-    {
-        $search = $request->input('search');
-        $filter = $request->input('filter', 'nama_barang');
-        $ruangan_filter = $request->input('ruangan_filter');
+{
+    $search = $request->input('search');
+    // Ambil parameter filter baru
+    $filter_type = $request->input('filter_type'); // ruangan, kategori, atau unit_kerja
+    $filter_value = $request->input('filter_value');
+    $sort = $request->input('sort', 'asc'); // default A-Z
 
-        $list_ruangan = BmnRuangan::orderBy('nama_ruangan', 'asc')->get();
+    // Ambil semua daftar untuk dropdown
+    $list_ruangan = BmnRuangan::orderBy('nama_ruangan', 'asc')->get();
+    $list_kategori = BmnKategori::orderBy('nama_kategori', 'asc')->get();
+    $list_unit_kerja = UnitKerja::orderBy('nama_unit_kerja', 'asc')->get();
 
-        $bmnQuery = BmnBarang::query()
-            ->whereDoesntHave('perawatanInventaris', function ($q) {
-                $q->where('jenis_perawatan', 'penghapusan');
-            });
+    $bmnQuery = BmnBarang::query()
+        ->whereDoesntHave('perawatanInventaris', function ($q) {
+            $q->where('jenis_perawatan', 'penghapusan');
+        });
 
-        // Filter dari Dropdown Ruangan (Filter Cepat)
-        if ($ruangan_filter) {
-            $bmnQuery->where('ruangan', $ruangan_filter);
+    // Logika Filter Berdasarkan Tipe
+    if ($filter_type && $filter_value) {
+        if ($filter_type == 'ruangan') {
+            $bmnQuery->where('ruangan', $filter_value);
+        } elseif ($filter_type == 'kategori') {
+            $bmnQuery->where('kategori', $filter_value);
+        } elseif ($filter_type == 'unit_kerja') {
+            $bmnQuery->where('unit_kerja', $filter_value);
         }
-
-        // Logika Pencarian Berdasarkan Input Teks
-        if ($search) {
-            if ($filter == 'nama_barang') {
-                $bmnQuery->where('nama_barang', 'like', '%' . $search . '%');
-            } elseif ($filter == 'kode_barang') {
-                $bmnQuery->where('kode_barang', 'like', '%' . $search . '%');
-            } elseif ($filter == 'kategori') { // Tambahkan filter kategori
-                $bmnQuery->where('kategori', 'like', '%' . $search . '%');
-            } elseif ($filter == 'ruangan') {
-                // Ini akan mencari di kolom 'ruangan' (baik nama Ruangan maupun Unit Kerja/User)
-                $bmnQuery->where('ruangan', 'like', '%' . $search . '%');
-            }
-        }
-
-        $barang = $bmnQuery->orderBy('created_at', 'DESC')->paginate(10);
-
-        return view('admin.barang.index_bmn', [
-            'title' => 'Data Barang BMN',
-            'barang' => $barang,
-            'list_ruangan' => $list_ruangan,
-            'ruangan_filter' => $ruangan_filter,
-        ]);
     }
+
+    // Logika Pencarian Teks
+    if ($search) {
+        $bmnQuery->where(function($q) use ($search) {
+            $q->where('nama_barang', 'like', '%' . $search . '%')
+              ->orWhere('kode_barang', 'like', '%' . $search . '%');
+        });
+    }
+
+    // Logika Pengurutan (Sorting)
+    $bmnQuery->orderBy('nama_barang', $sort);
+
+    $barang = $bmnQuery->paginate(15); // Ubah jumlah per halaman jika perlu
+
+    return view('admin.barang.index_bmn', [
+        'title'           => 'Data Barang BMN',
+        'barang'          => $barang,
+        'list_ruangan'    => $list_ruangan,
+        'list_kategori'   => $list_kategori,
+        'list_unit_kerja' => $list_unit_kerja,
+    ]);
+}
 
     /**
      * Show the form for creating a new resource.

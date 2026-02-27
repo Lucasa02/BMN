@@ -102,11 +102,17 @@
                         </a>
                     </li>
                     <li>
-            <a href="{{ route('bmn.pengguna.index') }}"
-                class="flex items-center p-2 pl-6 rounded-lg text-xs {{ request()->routeIs('bmn.pengguna.*') ? 'text-white font-bold' : 'text-white/60 hover:text-white' }}">
-                <i class="fa-solid fa-user-tag w-4 text-purple-400 mr-3"></i> Pengguna BMN
-            </a>
-        </li>
+                        <a href="{{ route('bmn.pengguna.index') }}"
+                            class="flex items-center p-2 pl-6 rounded-lg text-xs {{ request()->routeIs('bmn.pengguna.*') ? 'text-white font-bold' : 'text-white/60 hover:text-white' }}">
+                            <i class="fa-solid fa-user-tag w-4 text-purple-400 mr-3"></i> Pengguna
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('bmn.unit_kerja.index') }}"
+                            class="flex items-center p-2 pl-6 rounded-lg text-xs {{ request()->routeIs('bmn.unit_kerja.*') ? 'text-white font-bold' : 'text-white/60 hover:text-white' }}">
+                            <i class="fa-solid fa-building-user w-4 text-cyan-400 mr-3"></i> Unit Kerja
+                        </a>
+                    </li>
                     <li>
                         <a href="{{ route('bmn.jenis_kerusakan.index') }}"
                             class="flex items-center p-2 pl-6 rounded-lg text-xs {{ request()->routeIs('bmn.jenis_kerusakan.*') ? 'text-white font-bold' : 'text-white/60 hover:text-white' }}">

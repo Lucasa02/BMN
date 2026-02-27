@@ -9,7 +9,7 @@
         @page { size: a4 landscape; margin: 0.8cm; }
         * { font-family: "Calibri", Arial, sans-serif; box-sizing: border-box; }
         body { margin: 0; color: #111827; background-color: #fff; font-size: 11px; }
-        
+
         /* CSS untuk Cover */
         .cover-page {
             width: 100%;
@@ -49,38 +49,38 @@
             clear: both;
         }
 
-        .col-nama { 
-        width: 160px; 
+        .col-nama {
+        width: 160px;
         text-align: left !important; /* Menambahkan rata kiri */
         padding-left: 8px !important; /* Memberi sedikit jarak dari garis tepi kiri agar lebih rapi */
     }
 
         /* Styling Table Data & Header */
-        .header-table { 
-            width: 100%; 
-            border-collapse: collapse; 
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-bottom: 20px;
-            border-bottom: 2px solid #e5e7eb; 
+            border-bottom: 2px solid #e5e7eb;
         }
         .header-table td { border: none; vertical-align: middle; padding-bottom: 10px; }
         .header-left { text-align: left; width: 50%; }
         .header-right { text-align: right; width: 50%; }
-        
+
         /* Logo TVRI di header tetap 45px */
         .logo-img { height: 45px; width: auto; }
-        
+
         /* Class khusus untuk mengecilkan logo Esimprod (30px) */
         .logo-esimprod { height: 30px; width: auto; }
 
         table.data-table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
-        th { 
-            background-color: #1b365d; 
-            color: #ffffff; 
-            padding: 10px 4px; 
-            text-align: center; 
-            border: 1px solid #000; 
-            font-weight: bold; 
-            font-size: 10px; 
+        th {
+            background-color: #1b365d;
+            color: #ffffff;
+            padding: 10px 4px;
+            text-align: center;
+            border: 1px solid #000;
+            font-weight: bold;
+            font-size: 10px;
             text-transform: uppercase;
         }
         .data-table td { border: 1px solid #000; padding: 6px 4px; text-align: center; vertical-align: middle; word-wrap: break-word; font-size: 10px; }
@@ -89,7 +89,7 @@
         .col-nup { width: 35px; }       /* Diperkecil sedikit dari 40px */
         .col-nama { width: 160px; }     /* Dikurangi sedikit untuk memberi ruang ke Keterangan */
         .col-merk { width: 90px; }      /* Dikurangi sedikit */
-        .col-kondisi { width: 65px; }   
+        .col-kondisi { width: 65px; }
         .col-tgl { width: 80px; }
         .col-nilai { width: 95px; text-align: right !important; }
         .col-ruang { width: 90px; }     /* Dikurangi sedikit */
@@ -119,7 +119,7 @@
     </div>
 
     <div class="page-break"></div>
-    
+
     <table class="header-table">
         <tr>
             <td class="header-left">
@@ -128,7 +128,7 @@
                 @endif
             </td>
             <td class="header-right">
-                @php $logoEsimprod = public_path('img/assets/esimprod_logo.png'); @endphp
+                @php $logoEsimprod = public_path('img/assets/logo_esimba_white.png'); @endphp
                 @if(file_exists($logoEsimprod))
                     {{-- Menggunakan class logo-esimprod yang lebih kecil --}}
                     <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoEsimprod)) }}" class="logo-esimprod" alt="Logo Esimprod">
@@ -148,7 +148,8 @@
                 <th class="col-kondisi">Kondisi</th>
                 <th class="col-tgl">Tanggal Perolehan</th>
                 <th class="col-nilai">Nilai Perolehan</th>
-                <th class="col-ruang">Lokasi</th>
+                <th class="col-ruang">Lokasi /
+                  Pengguna</th>
                 <th class="col-ket">Keterangan</th>
             </tr>
         </thead>

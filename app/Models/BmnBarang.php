@@ -27,9 +27,10 @@ class BmnBarang extends Model
         'foto',
         'qr_code',
         'ruangan',
+        'unit_kerja',
         'tanggal_perolehan', // Tambahkan ini
         'nilai_perolehan',
-        'asal_pengadaan',  
+        'asal_pengadaan',
         'peruntukan',
         'posisi',
         'catatan',

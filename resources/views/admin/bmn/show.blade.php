@@ -2,314 +2,272 @@
 
 @section('content')
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <div class="font-display bg-[#f8fafc] dark:bg-[#0f172a] min-h-screen pb-12 overflow-x-hidden no-scrollbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <div class="min-h-screen bg-[#f8fafc] dark:bg-[#0b1120] font-['Plus_Jakarta_Sans'] pb-20 overflow-x-hidden">
 
-            {{-- Header Section --}}
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10" data-aos="fade-up">
-    <div class="space-y-2">
-        <h1 class="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight italic">
-            {{ $barang->nama_barang }}
-        </h1>
-        <div class="flex items-center gap-3">
-            <span class="h-1 w-12 bg-primary rounded-full"></span>
-            <p class="text-slate-500 dark:text-slate-400 font-medium tracking-wide uppercase text-xs">Aset
-                Inventaris Negara • {{ $barang->kode_barang }}</p>
-        </div>
-    </div>
+        {{-- High-End Decorative Top Bar --}}
+        <div class="h-1.5 w-full bg-gradient-to-r from-[#1b365d] via-[#3b82f6] to-[#1b365d] opacity-80"></div>
 
-    <div class="flex flex-wrap gap-3">
-        {{-- TOMBOL KEMBALI --}}
-        <a href="{{ route('barang.bmn_index', $ruangan) }}"
-            class="group flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-white px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm">
-            <span class="material-symbols-outlined text-slate-500 group-hover:-translate-x-1 transition-transform text-xl">arrow_back</span>
-            <span class="text-sm font-bold">Kembali</span>
-        </a>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
-        <a href="{{ route('bmn.edit', [$ruangan, $barang->id]) }}"
-            class="group flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-white px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary transition-all shadow-sm hover:shadow-md">
-            <span class="material-symbols-outlined text-primary group-hover:rotate-12 transition-transform text-xl">edit</span>
-            <span class="text-sm font-bold">Edit Detail</span>
-        </a>
+            {{-- Navigation & Top Actions --}}
+            <div class="flex flex-wrap items-center justify-between gap-6 mb-10" data-aos="fade-down">
+                <div class="space-y-1">
+                    <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                        <a href="{{ route('barang.bmn_index', $ruangan) }}" class="hover:text-[#1b365d] transition-colors">Inventaris</a>
+                        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                        <span class="text-[#1b365d] dark:text-blue-400">Arsip Digital</span>
+                    </nav>
+                    <h2 class="text-slate-900 dark:text-white font-bold tracking-tight italic">Detail Aset Negara</h2>
+                </div>
 
-        {{-- Tombol lainnya tetap sama --}}
-        <a href="{{ asset('storage/' . $barang->qr_code) }}" target="_blank"
-            class="flex items-center gap-2 bg-slate-900 dark:bg-primary text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 dark:hover:bg-blue-600 transition-all shadow-lg shadow-slate-200 dark:shadow-none">
-            <span class="material-symbols-outlined text-xl">qr_code_2</span>
-            <span class="text-sm font-bold">Cetak Label</span>
-        </a>
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('barang.bmn_index', $ruangan) }}"
+                       class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 transition-all shadow-sm">
+                        <span class="material-symbols-outlined text-lg">arrow_back</span>
+                        <span class="text-xs font-bold uppercase tracking-wider">Kembali</span>
+                    </a>
+                    <a href="{{ route('bmn.edit', [$ruangan, $barang->id]) }}"
+                       class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-[#1b365d]/20 dark:border-slate-700 rounded-2xl text-[#1b365d] dark:text-blue-300 hover:border-[#1b365d] transition-all shadow-sm">
+                        <span class="material-symbols-outlined text-lg">edit</span>
+                        <span class="text-xs font-bold uppercase tracking-wider">Sunting</span>
+                    </a>
+                </div>
+            </div>
 
-        <form action="{{ route('perawatan_inventaris.storeFromBarang', $barang->id) }}" method="POST">
-            @csrf
-            <button type="submit"
-                class="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-amber-100 dark:shadow-none">
-                <span class="material-symbols-outlined text-xl">build</span>
-                <span class="text-sm font-bold">Maintenance</span>
-            </button>
-        </form>
-    </div>
-</div>
+            {{-- Hero Section: Main Profile --}}
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-12">
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-                {{-- Column Left: Detail --}}
-                <div class="lg:col-span-8 space-y-8">
-
-                    {{-- Stats Cards --}}
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" data-aos="fade-up" data-aos-delay="100">
-                        <div
-                            class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
-                            <p class="text-xs font-semibold text-slate-400 uppercase mb-2">Kondisi</p>
-                            <span
-                                class="px-3 py-1 rounded-full text-[10px] font-black uppercase {{ $barang->persentase_kondisi >= 70 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700' }}">
-                                {{ $barang->kondisi }}
-                            </span>
-                        </div>
-                        <div
-                            class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
-                            <p class="text-xs font-semibold text-slate-400 uppercase mb-1">Total Unit</p>
-                            <p class="text-2xl font-black text-slate-800 dark:text-white">{{ $barang->jumlah }} <span
-                                    class="text-sm font-normal text-slate-400">Pcs</span></p>
-                        </div>
-                        <div
-                            class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
-                            <p class="text-xs font-semibold text-slate-400 uppercase mb-1">Tahun</p>
-                            <p class="text-2xl font-black text-slate-800 dark:text-white">
-                                {{ $barang->tanggal_perolehan ? \Carbon\Carbon::parse($barang->tanggal_perolehan)->format('Y') : '-' }}
-                            </p>
-                        </div>
-                        <div
-                            class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm border-b-4 border-b-primary">
-                            <p class="text-xs font-semibold text-slate-400 uppercase mb-1">Nilai Aset</p>
-                            <p class="text-lg font-black text-primary">
-                                Rp{{ number_format($barang->nilai_perolehan, 0, ',', '.') }}</p>
-                        </div>
-                    </div>
-
-                    {{-- Information Main Card --}}
-                    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden"
-                        data-aos="fade-up" data-aos-delay="200">
-                        <div class="p-8">
-                            <div class="flex items-center gap-3 mb-8 border-b border-slate-50 dark:border-slate-700 pb-5">
-                                <div class="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-                                    <span class="material-symbols-outlined text-primary text-xl font-bold">analytics</span>
-                                </div>
-                                <h3 class="text-xl font-bold text-slate-800 dark:text-white">Spesifikasi Teknis</h3>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                                <div class="space-y-6">
-                                    <div>
-                                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Merk &
-                                            Tipe</label>
-                                        <p class="text-slate-700 dark:text-slate-200 font-semibold text-lg">
-                                            {{ $barang->merk ?? 'Generic' }}</p>
+                {{-- Left: The Master Image --}}
+                <div class="lg:col-span-4" data-aos="zoom-in-right">
+                    <div class="relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-tr from-[#1b365d] to-blue-400 rounded-[3rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                        <div class="relative bg-white dark:bg-slate-800 p-3 rounded-[2.8rem] shadow-2xl shadow-slate-200/50 dark:shadow-none border border-white dark:border-slate-700">
+                            <div class="aspect-square rounded-[2.2rem] overflow-hidden bg-slate-50 dark:bg-[#0f172a] relative">
+                                @if ($barang->foto)
+                                    <img src="{{ asset('storage/' . $barang->foto) }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                                @else
+                                    <div class="w-full h-full flex flex-col items-center justify-center text-slate-200">
+                                        <span class="material-symbols-outlined text-8xl">inventory_2</span>
                                     </div>
-                                    <div>
-                                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Nomor
-                                            Seri / S/N</label>
-                                        <p class="text-slate-700 dark:text-slate-200 font-mono text-md italic">
-                                            {{ $barang->nomor_seri ?? 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Kategori
-                                            Aset</label>
-                                        <p class="text-slate-700 dark:text-slate-200 font-semibold">{{ $barang->kategori }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="space-y-6">
-                                    <div>
-                                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Asal
-                                            Pengadaan</label>
-                                        <p class="text-slate-700 dark:text-slate-200 font-semibold">
-                                            {{ $barang->asal_pengadaan ?? 'Hibah/Internal' }}</p>
-                                    </div>
-                                    <div>
-                                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">NUP
-                                            BMN</label>
-                                        <p class="text-slate-700 dark:text-slate-200 font-semibold italic">
-                                            {{ $barang->nup ?? '-' }}</p>
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Tanggal
-                                            Input</label>
-                                        <p class="text-slate-700 dark:text-slate-200 font-semibold">
-                                            {{ $barang->created_at->format('d M Y') }}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="mt-10 p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                <h4
-                                    class="text-sm font-black text-slate-800 dark:text-white mb-3 flex items-center gap-2 italic uppercase tracking-wider">
-                                    <span class="material-symbols-outlined text-primary text-sm">history_edu</span>
-                                    Deskripsi Tambahan
-                                </h4>
-                                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed italic opacity-80">
-                                    "{{ $barang->catatan ?? 'Tidak ada catatan khusus untuk aset ini.' }}"
-                                </p>
+                                @endif
+                                <div class="absolute inset-0 bg-gradient-to-t from-[#1b365d]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                             </div>
                         </div>
-                    </div>
 
-                    {{-- Lokasi Preview --}}
-                    <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm"
-                        data-aos="fade-up">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center gap-3">
-                                <div class="p-2 bg-rose-50 dark:bg-rose-900/30 rounded-lg">
-                                    <span
-                                        class="material-symbols-outlined text-rose-500 text-xl font-bold">location_on</span>
-                                </div>
-                                <h3 class="text-xl font-bold text-slate-800 dark:text-white">Lokasi</h3>
-                            </div>
-                            <span
-                                class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{{ $barang->ruangan }}</span>
-                        </div>
-
-                        <div
-                            class="relative group rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 aspect-video md:aspect-[21/9] border border-slate-100 dark:border-slate-700">
-                            @if ($barang->posisi)
-                                <img src="{{ asset('storage/' . $barang->posisi) }}"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                            @else
-                                <div class="flex flex-col items-center justify-center h-full text-slate-400">
-                                    <span
-                                        class="material-symbols-outlined text-6xl mb-2 opacity-20">not_listed_location</span>
-                                    <p class="text-xs font-bold uppercase tracking-tighter opacity-50">Visual lokasi tidak
-                                        tersedia</p>
-                                </div>
-                            @endif
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-                                <p class="text-white text-xs font-black uppercase tracking-widest">Informasi Lokasi
-                                    Strategis</p>
+                        {{-- Status Overlay --}}
+                        <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4">
+                            <div class="bg-white dark:bg-slate-800 px-6 py-3 rounded-2xl shadow-xl border border-slate-50 dark:border-slate-700 flex justify-between items-center">
+                                <span class="text-[10px] font-black uppercase text-slate-400">Kondisi</span>
+                                <span class="px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black">{{ $barang->kondisi }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Column Right: Media --}}
-                <div class="lg:col-span-4 space-y-6">
+                {{-- Right: Identity & High-Level Stats --}}
+                <div class="lg:col-span-8 flex flex-col justify-center" data-aos="fade-left">
+                    <div class="space-y-6">
+                        <div class="inline-flex items-center gap-3 px-4 py-2 bg-[#1b365d]/5 dark:bg-blue-900/20 text-[#1b365d] dark:text-blue-300 rounded-xl border border-[#1b365d]/10">
+                            <div class="flex gap-1">
+                                <div class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></div>
+                                <div class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse delay-75"></div>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Asset ID: {{ $barang->kode_barang }}</span>
+                        </div>
 
-                    {{-- Physical Photo --}}
-                    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm p-4"
-                        data-aos="fade-left">
-                        <div
-                            class="relative group rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-900 aspect-square mb-4 border border-slate-50 dark:border-slate-700">
-                            @if ($barang->foto)
-                                <img src="{{ asset('storage/' . $barang->foto) }}"
-                                    class="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-700">
+                        <h1 class="text-5xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">
+                            {{ $barang->nama_barang }}
+                        </h1>
+
+                        <p class="text-2xl text-slate-400 dark:text-slate-500 font-medium italic">
+                            {{ $barang->merk ?? 'Standard Issue' }} • <span class="text-[#1b365d] dark:text-blue-400">{{ $barang->kategori }}</span>
+                        </p>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6">
+                            @php
+                                $stats = [
+                                    ['label' => 'Nilai Perolehan', 'val' => 'Rp'.number_format($barang->nilai_perolehan, 0, ',', '.'), 'color' => 'text-[#1b365d]'],
+                                    ['label' => 'Tahun', 'val' => $barang->tanggal_perolehan ? \Carbon\Carbon::parse($barang->tanggal_perolehan)->format('Y') : '-', 'color' => 'text-slate-800'],
+                                    ['label' => 'Jumlah Unit', 'val' => $barang->jumlah . ' Unit', 'color' => 'text-slate-800'],
+                                    ['label' => 'NUP', 'val' => '#'.($barang->nup ?? '000'), 'color' => 'text-blue-600'],
+                                ];
+                            @endphp
+                            @foreach($stats as $s)
+                                <div class="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm p-5 rounded-3xl border border-white dark:border-slate-700 shadow-sm transition-transform hover:-translate-y-1">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{{ $s['label'] }}</p>
+                                    <p class="text-lg font-black {{ $s['color'] }} dark:text-white">{{ $s['val'] }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+                {{-- Column Left: Details & Visual Penempatan --}}
+                <div class="lg:col-span-2 space-y-10">
+
+                    {{-- Detailed Specifications --}}
+                    <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] p-10 border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden" data-aos="fade-up">
+                        <div class="flex items-center gap-4 mb-10">
+                            <div class="w-12 h-12 bg-[#1b365d] rounded-2xl flex items-center justify-center text-white">
+                                <span class="material-symbols-outlined">analytics</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Spesifikasi Teknis</h3>
+                                <p class="text-xs text-slate-400 font-medium uppercase tracking-widest">Parameter Aset Terdaftar</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                            @php
+                                $details = [
+                                    ['label' => 'Asal Pengadaan', 'value' => $barang->asal_pengadaan ?? 'Hibah/Internal', 'icon' => 'account_balance'],
+                                    ['label' => 'Nomor Seri / SN', 'value' => $barang->nomor_seri ?? 'N/A', 'icon' => 'barcode'],
+                                    ['label' => 'Unit Kerja', 'value' => $barang->unit_kerja ?? '-', 'icon' => 'corporate_fare'],
+                                    ['label' => 'Tanggal Input', 'value' => $barang->created_at->format('d M Y'), 'icon' => 'history'],
+                                ];
+                            @endphp
+                            @foreach($details as $d)
+                                <div class="flex items-center gap-5 group">
+                                    <div class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:bg-[#1b365d] group-hover:text-white transition-all duration-300">
+                                        <span class="material-symbols-outlined text-lg">{{ $d['icon'] }}</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-black text-slate-300 dark:text-slate-500 uppercase tracking-widest">{{ $d['label'] }}</p>
+                                        <p class="text-slate-700 dark:text-slate-200 font-bold tracking-tight">{{ $d['value'] }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-10 p-6 bg-slate-50 dark:bg-slate-900/50 rounded-[1.8rem] border border-dashed border-slate-200 dark:border-slate-700">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed italic">
+                                <span class="font-black text-[#1b365d] dark:text-blue-400 not-italic uppercase tracking-widest mr-2">Catatan:</span>
+                                "{{ $barang->catatan ?? 'Tidak ada informasi tambahan yang dilampirkan.' }}"
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Visual Penempatan (FOTO POSISI) --}}
+                    <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] p-10 border border-slate-100 dark:border-slate-700 shadow-sm" data-aos="fade-up" data-aos-delay="100">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-[#1b365d] dark:text-blue-400">
+                                    <span class="material-symbols-outlined">distance</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Titik Penempatan</h3>
+                                    <p class="text-xs text-slate-400 font-medium uppercase tracking-widest">Lokasi: {{ $barang->ruangan }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative group rounded-[2.2rem] overflow-hidden bg-slate-100 dark:bg-slate-900 aspect-video md:aspect-[21/8] border border-slate-100 dark:border-slate-700">
+                            @if ($barang->posisi)
+                                <img src="{{ asset('storage/' . $barang->posisi) }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105">
+                                <div class="absolute inset-0 bg-gradient-to-t from-[#1b365d]/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end p-8">
+                                    <p class="text-white text-xs font-bold flex items-center gap-2 tracking-widest uppercase">
+                                        <span class="material-symbols-outlined text-sm">verified</span>
+                                        Dokumentasi Titik Lokasi Statis
+                                    </p>
+                                </div>
                             @else
-                                <div class="flex flex-col items-center justify-center h-full text-slate-300">
-                                    <span class="material-symbols-outlined text-7xl opacity-20">image</span>
+                                <div class="flex flex-col items-center justify-center h-full text-slate-300 gap-3">
+                                    <span class="material-symbols-outlined text-6xl opacity-20">not_listed_location</span>
+                                    <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Belum ada foto posisi</p>
                                 </div>
                             @endif
                         </div>
-                        <div class="text-center pb-2">
-                            <h4 class="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-tighter">Foto
-                                Fisik Barang</h4>
-                            <p class="text-[10px] text-slate-400 font-medium">Terakhir diperbarui:
-                                {{ $barang->updated_at->diffForHumans() }}</p>
-                        </div>
                     </div>
+                </div>
+
+                {{-- Column Right: Actions & Digital ID --}}
+                <div class="space-y-8" data-aos="fade-left" data-aos-delay="200">
 
                     {{-- Digital ID Card --}}
-                    <div class="bg-gradient-to-br from-primary to-blue-700 rounded-3xl shadow-xl p-8 text-white relative overflow-hidden"
-                        data-aos="fade-left" data-aos-delay="100">
-                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-                        <div class="relative z-10 flex flex-col items-center">
-                            <h4 class="text-xs font-black uppercase tracking-[0.2em] mb-6 opacity-80">Identitas Digital
-                            </h4>
-                            <div
-                                class="bg-white p-3 rounded-2xl shadow-inner mb-6 transition-transform hover:scale-105 duration-500">
+                    <div class="bg-[#1b365d] rounded-[2.5rem] p-8 text-white shadow-2xl shadow-blue-900/40 relative overflow-hidden group">
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+
+                        <div class="relative z-10 flex flex-col items-center text-center">
+                            <h4 class="text-[10px] font-black uppercase tracking-[0.4em] opacity-60 mb-8">E-Label System</h4>
+
+                            <div class="bg-white p-4 rounded-[2rem] shadow-2xl mb-8 transform group-hover:rotate-2 transition-transform duration-500">
                                 <img src="{{ asset('storage/' . $barang->qr_code) }}" class="w-32 h-32">
                             </div>
-                            <p class="text-[10px] font-bold tracking-widest uppercase mb-1">Asset Security Code</p>
-                            <p class="text-xs font-mono opacity-80 select-all">{{ $barang->uuid }}</p>
+
+                            <div class="space-y-1 mb-6">
+                                <p class="text-[10px] font-bold text-blue-300 uppercase tracking-widest">Unique UUID</p>
+                                <p class="text-[11px] font-mono opacity-80 break-all bg-black/20 p-2 rounded-lg">{{ $barang->uuid }}</p>
+                            </div>
+
+                            <a href="{{ asset('storage/' . $barang->qr_code) }}" target="_blank"
+                               class="w-full py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all">
+                                Cetak Label QR
+                            </a>
                         </div>
                     </div>
 
-                    {{-- Maintenance Status --}}
-                    @if ($perawatan)
-                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-3xl border border-amber-100 dark:border-amber-800/50 p-6"
-                            data-aos="zoom-in">
-                            <div class="flex items-center gap-4">
-                                <div class="relative flex items-center justify-center">
-                                    <span
-                                        class="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 animate-ping"></span>
-                                    <div
-                                        class="relative p-2 bg-amber-500 rounded-full text-white shadow-lg shadow-amber-200 dark:shadow-none">
-                                        <span class="material-symbols-outlined text-sm font-bold">engineering</span>
+                    {{-- Maintenance Action --}}
+                    <div class="space-y-3">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-4">Manajemen Operasional</p>
+                        <form action="{{ route('perawatan_inventaris.storeFromBarang', $barang->id) }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                class="w-full group flex items-center justify-between p-6 bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-amber-200 transition-all duration-300">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-amber-50 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center text-amber-500">
+                                        <span class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-700">build</span>
+                                    </div>
+                                    <div class="text-left">
+                                        <h5 class="text-sm font-black text-slate-800 dark:text-white uppercase">Maintenance</h5>
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase">Update Kondisi</p>
                                     </div>
                                 </div>
-                                <div>
-                                    <h4
-                                        class="text-xs font-black text-amber-900 dark:text-amber-200 uppercase tracking-widest">
-                                        Perawatan Aktif</h4>
-                                    <p class="text-xs text-amber-700 dark:text-amber-400 font-bold italic">
-                                        {{ ucfirst($perawatan->status) }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+                                <span class="material-symbols-outlined text-slate-300 group-hover:text-amber-500 transition-colors">chevron_right</span>
+                            </button>
+                        </form>
 
-                    {{-- Delete Action --}}
-                    <form action="{{ route('bmn.delete', [$ruangan, $barang->id]) }}" method="POST"
-                        onsubmit="return confirm('Anda yakin ingin menghapus aset berharga ini?')" class="pt-4"
-                        data-aos="fade-up">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                            class="w-full flex items-center justify-center gap-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 py-3 rounded-2xl border border-transparent hover:border-rose-100 transition-all text-xs font-black uppercase tracking-widest italic">
-                            <span class="material-symbols-outlined text-sm">delete_sweep</span>
-                            Hapus Permanen
-                        </button>
-                    </form>
-
+                        {{-- Delete Action --}}
+                        <form action="{{ route('bmn.delete', [$ruangan, $barang->id]) }}" method="POST"
+                            onsubmit="return confirm('Sistem: Anda akan menghapus aset ini secara permanen dari basis data negara. Lanjutkan?')"
+                            class="pt-4 px-4 text-center">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="text-rose-400 hover:text-rose-600 text-[10px] font-black uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2 mx-auto">
+                                <span class="material-symbols-outlined text-sm">delete_forever</span>
+                                Hapus Arsip Aset
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Scripts --}}
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({
-            duration: 800,
+            duration: 1000,
             once: true,
-            easing: 'ease-out-quad'
+            easing: 'ease-out-quint'
         });
     </script>
 
     <style>
-        /* HIDE SCROLLBAR BUT KEEP SCROLLABLE */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-            /* Chrome, Safari, Opera */
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1b365d; border-radius: 10px; }
 
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            /* IE and Edge */
-            scrollbar-width: none;
-            /* Firefox */
-        }
-
-        /* PREVENT HORIZONTAL SCROLL */
-        html,
-        body {
-            max-width: 100%;
-            overflow-x: hidden;
-        }
-
-        .font-display {
-            font-family: 'Inter', sans-serif;
+        /* Modern Glass Effect */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
     </style>
 @endsection

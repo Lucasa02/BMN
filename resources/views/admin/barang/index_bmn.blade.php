@@ -8,7 +8,6 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -50,13 +49,13 @@
 
         /* Custom Gradient Button */
         .btn-gradient-blue {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            background: linear-gradient(135deg, #1b365d 0%, #2d5a9e 100%);
             transition: all 0.3s ease;
         }
 
         .btn-gradient-blue:hover {
             filter: brightness(115%);
-            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.4);
+            box-shadow: 0 4px 15px rgba(27, 54, 93, 0.4);
         }
     </style>
 
@@ -64,12 +63,12 @@
         $ruanganNames = $list_ruangan->pluck('nama_ruangan')->toArray();
     @endphp
 
-    <div class="px-6 py-6">
+    <div class="px-6 py-6 font-['Plus_Jakarta_Sans']">
         {{-- HEADER & TOOLS --}}
         <div
             class="glass-header sticky top-4 z-30 mb-8 p-4 rounded-2xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <div class="p-3 bg-blue-100 rounded-xl text-blue-700">
+                <div class="p-3 bg-blue-50 rounded-xl text-[#1b365d]">
                     <i class="fa-solid fa-boxes-stacked text-xl"></i>
                 </div>
                 <div>
@@ -97,13 +96,13 @@
                     <ul class="py-2 text-sm text-gray-700">
                         <li>
                             <a href="{{ route('bmn.create', 'general') }}"
-                                class="block px-4 py-3 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                                class="block px-4 py-3 hover:bg-blue-50 hover:text-[#1b365d] transition-colors">
                                 <i class="fa-solid fa-plus-circle mr-2 opacity-70"></i> Tambah Barang
                             </a>
                         </li>
                         <li>
                             <button data-modal-target="print-modal" data-modal-toggle="print-modal"
-                                class="w-full text-left block px-4 py-3 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                                class="w-full text-left block px-4 py-3 hover:bg-blue-50 hover:text-[#1b365d] transition-colors">
                                 <i class="fa-solid fa-print mr-2 opacity-70"></i> Menu Cetak & QR
                             </button>
                         </li>
@@ -113,44 +112,81 @@
         </div>
 
         {{-- SEARCH & FILTER BAR --}}
-        <form class="mb-8" action="{{ url()->current() }}" method="GET">
-            <div class="flex flex-col md:flex-row gap-3 bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
-                <div class="flex-1 relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
-                    </div>
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        class="block w-full pl-11 pr-4 py-3 bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 rounded-xl text-sm transition-all"
-                        placeholder="Cari nama barang, kode, atau spesifikasi...">
+        <form id="filterForm" class="mb-8" action="{{ url()->current() }}" method="GET">
+    <div class="bg-white p-2 md:p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-col lg:flex-row items-center gap-3">
+
+        {{-- Group 1: Search & Sort --}}
+        <div class="flex items-center gap-2 w-full lg:w-1/3">
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-xs text-gray-400"></i>
                 </div>
-
-                <div class="flex gap-2">
-                    <select name="ruangan_filter" onchange="this.form.submit()"
-                        class="bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 text-gray-700 text-sm rounded-xl block p-3 transition-all">
-                        <option value="">Semua Ruangan</option>
-                        @foreach ($list_ruangan as $rm)
-                            <option value="{{ $rm->nama_ruangan }}"
-                                {{ request('ruangan_filter') == $rm->nama_ruangan ? 'selected' : '' }}>
-                                {{ $rm->nama_ruangan }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <select name="filter"
-                        class="bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 text-gray-700 text-sm rounded-xl block p-3 transition-all">
-                        <option value="nama_barang" {{ request('filter') == 'nama_barang' ? 'selected' : '' }}>Nama</option>
-                        <option value="kode_barang" {{ request('filter') == 'kode_barang' ? 'selected' : '' }}>Kode</option>
-                        <option value="kategori" {{ request('filter') == 'kategori' ? 'selected' : '' }}>Kategori</option>
-                        <option value="ruangan" {{ request('filter') == 'ruangan' ? 'selected' : '' }}>Lokasi</option>
-                    </select>
-
-                    <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-xl font-medium transition-colors shadow-md shadow-blue-200">
-                        Cari
-                    </button>
-                </div>
+                <input type="text" name="search" value="{{ request('search') }}"
+                    class="block w-full pl-10 pr-4 py-2.5 bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] rounded-xl text-sm transition-all"
+                    placeholder="Cari aset...">
             </div>
-        </form>
+
+            <select name="sort" onchange="this.form.submit()"
+                class="w-32 bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] text-gray-600 text-xs font-bold rounded-xl py-2.5 transition-all cursor-pointer">
+                <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>A - Z</option>
+                <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Z - A</option>
+            </select>
+        </div>
+
+        {{-- Divider Line (Desktop Only) --}}
+        <div class="hidden lg:block w-px h-8 bg-gray-100"></div>
+
+        {{-- Group 2: Dynamic Filters --}}
+        <div class="flex flex-col sm:flex-row items-center gap-2 w-full lg:flex-1">
+            <div class="grid grid-cols-2 gap-2 w-full">
+                {{-- Tipe Filter --}}
+                <select id="filter_type" name="filter_type"
+                    class="bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] text-gray-600 text-xs font-semibold rounded-xl py-2.5 transition-all cursor-pointer">
+                    <option value="">Semua Filter</option>
+                    <option value="ruangan" {{ request('filter_type') == 'ruangan' ? 'selected' : '' }}>Ruangan</option>
+                    <option value="kategori" {{ request('filter_type') == 'kategori' ? 'selected' : '' }}>Kategori</option>
+                    <option value="unit_kerja" {{ request('filter_type') == 'unit_kerja' ? 'selected' : '' }}>Unit Kerja</option>
+                </select>
+
+                {{-- Nilai Filter --}}
+                <select id="filter_value" name="filter_value" onchange="this.form.submit()"
+                    class="bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] text-gray-600 text-xs font-semibold rounded-xl py-2.5 transition-all cursor-pointer {{ !request('filter_type') ? 'opacity-50' : '' }}"
+                    {{ !request('filter_type') ? 'disabled' : '' }}>
+                    <option value="">Pilih Data...</option>
+                    @if(request('filter_type') == 'ruangan')
+                        @foreach($list_ruangan as $r)
+                            <option value="{{ $r->nama_ruangan }}" {{ request('filter_value') == $r->nama_ruangan ? 'selected' : '' }}>{{ $r->nama_ruangan }}</option>
+                        @endforeach
+                    @elseif(request('filter_type') == 'kategori')
+                        @foreach($list_kategori as $k)
+                            <option value="{{ $k->nama_kategori }}" {{ request('filter_value') == $k->nama_kategori ? 'selected' : '' }}>{{ $k->nama_kategori }}</option>
+                        @endforeach
+                    @elseif(request('filter_type') == 'unit_kerja')
+                        @foreach($list_unit_kerja as $u)
+                            <option value="{{ $u->nama_unit_kerja }}" {{ request('filter_value') == $u->nama_unit_kerja ? 'selected' : '' }}>{{ $u->nama_unit_kerja }}</option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
+        </div>
+
+        {{-- Group 3: Actions --}}
+        <div class="flex items-center gap-2 w-full lg:w-auto">
+            <button type="submit"
+                class="flex-1 lg:flex-none bg-[#1b365d] hover:bg-[#2d5a9e] text-white px-6 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm">
+                Terapkan
+            </button>
+
+            @if(request()->anyFilled(['search', 'filter_type', 'filter_value']))
+                <a href="{{ route('barang.bmn_index') }}"
+                    class="p-2.5 text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all"
+                    title="Reset Semua">
+                    <i class="fa-solid fa-filter-circle-xmark"></i>
+                </a>
+            @endif
+        </div>
+    </div>
+</form>
 
         {{-- GRID CARDS --}}
         @if ($barang->isEmpty())
@@ -166,58 +202,68 @@
                         $isRuangan = in_array($b->ruangan, $ruanganNames);
                     @endphp
 
-                    <div class="animate-card group bg-white rounded-3xl border border-gray-100 shadow-sm hover-lift overflow-hidden flex flex-col"
+                    <div class="animate-card group bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover-lift overflow-hidden flex flex-col"
                         style="animation-delay: {{ $index * 0.05 }}s">
 
-                        <div class="relative h-52 bg-gray-50 overflow-hidden">
-                            <div class="absolute top-3 left-3 z-10">
+                        <div class="relative h-52 bg-slate-50 overflow-hidden">
+                            <div class="absolute top-4 left-4 z-10">
                                 <span
-                                    class="bg-white/90 backdrop-blur text-blue-900 text-[10px] font-extrabold px-3 py-1.5 rounded-full shadow-sm uppercase tracking-wider">
+                                    class="bg-white/90 backdrop-blur text-[#1b365d] text-[9px] font-black px-3 py-1.5 rounded-full shadow-sm uppercase tracking-[0.1em]">
                                     {{ $b->kategori }}
                                 </span>
                             </div>
 
                             <img src="{{ $fotoPath }}" alt="{{ $b->nama_barang }}"
-                                class="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-700 ease-out">
+                                class="w-full h-full object-contain p-8 group-hover:scale-110 transition-transform duration-700 ease-out">
 
                             <div
-                                class="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                class="absolute inset-0 bg-gradient-to-t from-[#1b365d]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             </div>
                         </div>
 
-                        <div class="p-5 flex-1 flex flex-col">
+                        <div class="p-6 flex-1 flex flex-col">
                             <h3
-                                class="font-bold text-gray-800 text-sm mb-4 line-clamp-2 leading-snug h-10 group-hover:text-blue-700 transition-colors">
+                                class="font-bold text-gray-800 text-sm mb-5 line-clamp-2 leading-snug h-10 group-hover:text-[#1b365d] transition-colors tracking-tight">
                                 {{ $b->nama_barang }}
                             </h3>
 
-                            <div class="space-y-3 mb-5">
-                                <div
-                                    class="flex justify-between items-center bg-gray-50 rounded-xl px-3 py-2 border border-gray-50">
-                                    <span class="text-[10px] uppercase tracking-wide text-gray-400 font-bold">Kondisi</span>
-                                    <span
-                                        class="text-[11px] font-bold px-2 py-0.5 rounded-lg {{ in_array($b->kondisi, ['Baik', 'Sangat Baik']) ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50' }}">
-                                        {{ $b->kondisi }}
+                            <div class="space-y-4 mb-6">
+                                {{-- KONDISI BADGE --}}
+                                <div class="flex justify-between items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
+                                    <span class="text-[9px] uppercase tracking-widest text-slate-400 font-black">Kondisi</span>
+                                    <span class="text-[10px] font-black px-2 py-0.5 rounded-lg {{ in_array($b->kondisi, ['Baik', 'Sangat Baik']) ? 'text-emerald-700 bg-emerald-100/50' : 'text-rose-700 bg-rose-100/50' }}">
+                                        {{ strtoupper($b->kondisi) }}
                                     </span>
                                 </div>
 
-                                <div class="flex flex-col gap-1 px-1">
-                                    <div class="flex items-center gap-2 text-gray-500">
-                                        <i
-                                            class="fa-solid {{ $isRuangan ? 'fa-location-dot' : 'fa-user-tie' }} text-[10px]"></i>
-                                        <span class="text-[11px] font-medium truncate">{{ $b->ruangan }}</span>
+                                <div class="flex flex-col gap-2.5 px-1">
+                                    {{-- LOKASI --}}
+                                    <div class="flex items-center gap-2 text-[#1b365d]">
+                                        <div class="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center">
+                                            <i class="fa-solid {{ $isRuangan ? 'fa-location-dot' : 'fa-user-tie' }} text-[10px]"></i>
+                                        </div>
+                                        <span class="text-[11px] font-bold truncate">{{ $b->ruangan }}</span>
                                     </div>
-                                    <div class="flex items-center gap-2 text-gray-400">
+
+                                    {{-- UNIT KERJA (DESIGN BARU - LEBIH TERLIHAT) --}}
+                                    <div class="flex items-center gap-2 text-[#1b365d]">
+                                      <div class="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center">
+                                          <i class="fa-solid fa-building-user text-[10px]"></i>
+                                      </div>
+                                      <span class="text-[11px] font-bold truncate">{{ $b->unit_kerja ?? '-' }}</span>
+                                  </div>
+
+                                    {{-- KODE BARANG --}}
+                                    <div class="flex items-center gap-2 text-slate-400 pt-1.5 border-t border-slate-50">
                                         <i class="fa-solid fa-barcode text-[10px]"></i>
-                                        <span
-                                            class="text-[11px] font-mono tracking-tighter">{{ $b->kode_barang ?? '-' }}</span>
+                                        <span class="text-[10px] font-mono tracking-tighter uppercase">{{ $b->kode_barang ?? '-' }}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="mt-auto pt-4 border-t border-gray-100 flex items-center gap-2">
+                            <div class="mt-auto pt-4 flex items-center gap-2">
                                 <a href="{{ $detailRoute }}"
-                                    class="flex-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white py-2.5 rounded-xl text-xs font-bold transition-all text-center">
+                                    class="flex-1 bg-slate-50 hover:bg-[#1b365d] text-[#1b365d] hover:text-white py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-center">
                                     Detail
                                 </a>
 
@@ -246,24 +292,23 @@
         </div>
     </div>
 
-    {{-- MODAL CETAK (VERSI MEWAH) --}}
+    {{-- MODAL CETAK --}}
     <div id="print-modal" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full backdrop-blur-md bg-gray-900/40 transition-all duration-300">
         <div class="relative p-4 w-full max-w-md max-h-full animate-card">
             <div
-                class="relative bg-white rounded-[2rem] shadow-2xl dark:bg-gray-800 border border-white/20 overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800">
+                class="relative bg-white rounded-[2.5rem] shadow-2xl dark:bg-gray-800 border border-white/20 overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#1b365d] via-blue-600 to-[#1b365d]">
                 </div>
 
                 <div class="flex items-center justify-between p-6 border-b border-gray-50">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-[#1b365d]">
                             <i class="fa-solid fa-print text-lg"></i>
                         </div>
                         <div>
                             <h3 class="text-lg font-bold text-gray-800">Opsi Cetak BMN</h3>
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Laporan & QR Code
-                            </p>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Laporan & QR Code</p>
                         </div>
                     </div>
                     <button type="button" data-modal-hide="print-modal"
@@ -276,15 +321,14 @@
                     <form id="printForm" method="GET" target="_blank" class="space-y-6">
                         <input type="hidden" name="kategori" value="bmn">
                         <div class="relative">
-                            <label class="block mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Pilih
-                                Lokasi / Ruangan</label>
+                            <label class="block mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Pilih Lokasi / Ruangan</label>
                             <div class="relative group">
                                 <div
-                                    class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-500">
+                                    class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#1b365d]">
                                     <i class="fa-solid fa-location-dot"></i>
                                 </div>
                                 <select id="print_ruangan" name="ruangan"
-                                    class="bg-gray-50 border border-gray-100 text-gray-700 text-sm rounded-2xl block w-full pl-11 p-3.5 focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer transition-all">
+                                    class="bg-gray-50 border border-gray-100 text-gray-700 text-sm rounded-2xl block w-full pl-11 p-3.5 focus:ring-2 focus:ring-[#1b365d] appearance-none cursor-pointer transition-all">
                                     <option value="all">Seluruh Ruangan</option>
                                     @foreach ($list_ruangan as $rm)
                                         <option value="{{ $rm->nama_ruangan }}">{{ $rm->nama_ruangan }}</option>
@@ -295,7 +339,7 @@
 
                         <div class="grid grid-cols-2 gap-4">
                             <button type="button" onclick="submitPrint('{{ route('barang.print-barang') }}')"
-                                class="group flex flex-col items-center justify-center gap-2 p-4 bg-white border border-gray-100 rounded-2xl hover:border-blue-500 hover:shadow-xl transition-all">
+                                class="group flex flex-col items-center justify-center gap-2 p-4 bg-white border border-gray-100 rounded-2xl hover:border-[#1b365d] hover:shadow-xl transition-all">
                                 <div
                                     class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <i class="fa-solid fa-file-pdf text-xl"></i>
@@ -329,17 +373,16 @@
         </div>
     </div>
 
-    {{-- MODAL HAPUS (DISESUAIKAN) --}}
+    {{-- MODAL HAPUS --}}
     <div id="delete-modal" tabindex="-1"
         class="hidden fixed inset-0 z-50 justify-center items-center backdrop-blur-sm bg-gray-900/40 transition-all">
         <div class="relative p-4 w-full max-w-md animate-card">
-            <div class="relative bg-white rounded-[2rem] shadow-2xl p-8 text-center border border-gray-100">
+            <div class="relative bg-white rounded-[2.5rem] shadow-2xl p-8 text-center border border-gray-100">
                 <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
                     <i class="fa-solid fa-triangle-exclamation text-4xl"></i>
                 </div>
                 <h3 class="mb-2 text-xl font-bold text-gray-800">Hapus Data BMN?</h3>
-                <p class="mb-8 text-sm text-gray-500 leading-relaxed">Tindakan ini tidak dapat dibatalkan. Seluruh riwayat
-                    aset ini akan terhapus secara permanen.</p>
+                <p class="mb-8 text-sm text-gray-500 leading-relaxed">Tindakan ini tidak dapat dibatalkan. Seluruh riwayat aset ini akan terhapus secara permanen.</p>
                 <form id="deleteForm" method="POST">
                     @csrf
                     @method('DELETE')
@@ -347,8 +390,7 @@
                         <button type="button" data-modal-hide="delete-modal"
                             class="flex-1 px-5 py-3 text-sm font-bold text-gray-700 bg-gray-100 rounded-2xl hover:bg-gray-200 transition-all">Batal</button>
                         <button type="submit"
-                            class="flex-1 px-5 py-3 text-sm font-bold text-white bg-red-600 rounded-2xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all">Ya,
-                            Hapus Aset</button>
+                            class="flex-1 px-5 py-3 text-sm font-bold text-white bg-red-600 rounded-2xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all">Ya, Hapus Aset</button>
                     </div>
                 </form>
             </div>
@@ -358,14 +400,41 @@
 
 @section('scripts')
     <script>
-        function submitPrint(url) {
-            const form = document.getElementById('printForm');
-            form.action = url;
-            form.submit();
+        document.getElementById('filter_type').addEventListener('change', function() {
+        const type = this.value;
+        const valueSelect = document.getElementById('filter_value');
+
+        // Reset dropdown
+        valueSelect.innerHTML = '<option value="">Pilih Data...</option>';
+
+        if (!type) {
+            valueSelect.disabled = true;
+            valueSelect.classList.add('opacity-50');
+            this.form.submit(); // Reset filter jika memilih "Semua Filter"
+            return;
         }
 
-        function confirmDelete(url) {
-            document.getElementById('deleteForm').action = url;
+        valueSelect.disabled = false;
+        valueSelect.classList.remove('opacity-50');
+
+        let options = [];
+        // Menggunakan data yang sudah dipassing dari Controller
+        if (type === 'ruangan') {
+            options = @json($list_ruangan->pluck('nama_ruangan'));
+        } else if (type === 'kategori') {
+            options = @json($list_kategori->pluck('nama_kategori'));
+        } else if (type === 'unit_kerja') {
+            options = @json($list_unit_kerja->pluck('nama_unit_kerja'));
         }
+
+        options.forEach(opt => {
+            const el = document.createElement('option');
+            el.value = opt;
+            el.textContent = opt;
+            // Pertahankan seleksi jika ada
+            if(opt === "{{ request('filter_value') }}") el.selected = true;
+            valueSelect.appendChild(el);
+        });
+    });
     </script>
 @endsection
