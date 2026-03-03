@@ -11,13 +11,13 @@
         .title-center { text-align: center; width: 70%; }
         .title-center h2 { margin: 0; font-size: 16px; text-transform: uppercase; }
         .title-center p { margin: 2px 0; font-size: 12px; }
-        
+
         table.data-table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
         table.data-table th, table.data-table td { border: 1px solid #ddd; padding: 6px; text-align: left; word-wrap: break-word; }
-        
-        table.data-table th { 
-            background-color: #1b365d; 
-            color: white; 
+
+        table.data-table th {
+            background-color: #1b365d;
+            color: white;
             text-transform: uppercase;
             font-size: 9px;
         }
@@ -45,7 +45,7 @@
                 <small>Dicetak pada: {{ date('d/m/Y H:i') }}</small>
             </td>
             <td class="logo-right">
-                <img src="{{ public_path('img/assets/esimprod_logo.png') }}" style="height: 30px; width: auto;">
+                <img src="{{ public_path('img/assets/logo_esimba_bluebg.png') }}" style="height: 30px; width: auto;">
             </td>
         </tr>
     </table>

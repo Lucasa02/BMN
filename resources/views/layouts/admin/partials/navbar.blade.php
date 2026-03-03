@@ -53,7 +53,7 @@
 
         <a href="{{ route('dashboard.index') }}" class="flex items-center group">
           <div class="logo-container">
-            <img src="{{ asset('img/assets/logo_esimba_white.png') }}" class="h-8 transition-transform group-hover:scale-110" alt="Logo" />
+            <img src="{{ asset('img/assets/logo_esimba_bluebg.png') }}" class="h-8 transition-transform group-hover:scale-110" alt="Logo" />
           </div>
           <div class="flex flex-col ms-3">
             <span class="text-lg font-bold tracking-wider text-white uppercase">ESIMBA</span>

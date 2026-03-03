@@ -8,7 +8,7 @@
                 <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Detail Laporan</h2>
                 <p class="text-sm text-slate-500 mt-1">Informasi lengkap mengenai kerusakan aset barang.</p>
             </div>
-            <a href="{{ route('admin.laporan-kerusakan.index') }}" 
+            <a href="{{ route('admin.laporan-kerusakan.index') }}"
                class="group inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-full shadow-sm hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 hover:shadow-md transition-all duration-300 ease-out">
                 <span class="transform transition-transform duration-300 group-hover:-translate-x-1">←</span>
                 Kembali ke Daftar
@@ -18,19 +18,31 @@
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="p-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Nama Barang</label>
-                            <p class="text-lg font-medium text-slate-800">{{ $laporan->barang->nama_barang }}</p>
-                        </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Jenis Kerusakan</label>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-50 text-amber-700 border border-amber-100">
-                                {{ $laporan->jenis_kerusakan }}
-                            </span>
-                        </div>
+                    <div class="space-y-6">
+                      <div>
+                          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Nama Barang</label>
+                          <p class="text-lg font-medium text-slate-800">{{ $laporan->barang->nama_barang }}</p>
+                      </div>
+
+                      <div>
+                          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Tanggal Laporan</label>
+                          <p class="text-sm font-medium text-slate-700">
+                              <span class="flex items-center gap-1.5">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                                  {{ $laporan->created_at->translatedFormat('d F Y') }}
+                                  <span class="text-slate-400 font-normal ml-1">({{ $laporan->created_at->format('H:i') }} WIB)</span>
+                              </span>
+                          </p>
+                      </div>
+                      <div>
+                          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Jenis Kerusakan</label>
+                          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-50 text-amber-700 border border-amber-100">
+                              {{ $laporan->jenis_kerusakan }}
+                          </span>
+                      </div>
 
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Deskripsi Masalah</label>
@@ -54,7 +66,7 @@
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 self-start">Bukti Foto</label>
                         @if ($laporan->foto)
                             <div class="group relative overflow-hidden rounded-2xl ring-1 ring-slate-200 transition-all hover:ring-indigo-300 shadow-sm w-full">
-                                <img src="{{ asset('storage/'.$laporan->foto) }}" 
+                                <img src="{{ asset('storage/'.$laporan->foto) }}"
                                      class="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-110"
                                      alt="Foto Kerusakan">
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -73,7 +85,7 @@
                 <hr class="my-8 border-slate-100">
 
                 <div class="flex items-center justify-end gap-4">
-                    
+
                     <form action="{{ route('admin.laporan-kerusakan.tolak', $laporan->uuid) }}" method="POST">
                         @csrf
                         <button class="px-6 py-2.5 text-sm font-semibold text-rose-600 bg-white border border-rose-200 rounded-full shadow-sm hover:bg-rose-50 hover:border-rose-300 hover:text-rose-700 hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-300 ease-out focus:ring-4 focus:ring-rose-100">

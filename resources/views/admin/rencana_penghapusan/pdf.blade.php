@@ -4,7 +4,7 @@
     <title>Laporan Rencana Penghapusan</title>
     <style>
         body { font-family: sans-serif; font-size: 12px; }
-        
+
         /* Style untuk Header Logo */
         .header-table {
             width: 100%;
@@ -34,21 +34,21 @@
         }
 
         /* Style untuk Tabel Data */
-        table.data-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
-        table.data-table th, table.data-table td { 
-            border: 1px solid #333; 
-            padding: 10px 8px; 
-            text-align: left; 
+        table.data-table th, table.data-table td {
+            border: 1px solid #333;
+            padding: 10px 8px;
+            text-align: left;
         }
-        
+
         /* Bagian yang diubah: Header Tabel berwarna #1b365d */
-        table.data-table th { 
-            background-color: #1b365d; 
-            color: white; 
+        table.data-table th {
+            background-color: #1b365d;
+            color: white;
             text-transform: uppercase;
             font-size: 11px;
         }
@@ -71,12 +71,12 @@
                 <p style="margin: 5px 0 0 0;">Tanggal Cetak: {{ now()->translatedFormat('d F Y') }}</p>
             </td>
             <td class="logo-right">
-                <img src="{{ public_path('img/assets/esimprod_logo.png') }}" style="height: 40px;">
+                <img src="{{ public_path('img/assets/logo_esimba_bluebg.png') }}" style="height: 40px;">
             </td>
         </tr>
     </table>
 
-    <hr style="border: 1px solid #eee;"> 
+    <hr style="border: 1px solid #eee;">
 
     <table class="data-table">
         <thead>

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="csrf-token" content="{{ csrf_token() }}" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <link rel="shortcut icon" href="{{ asset('img/assets/logo_bmn_bg.png') }}" type="image/x-icon" />
+  <link rel="shortcut icon" href="{{ asset('img/assets/bg_esimba.png') }}" type="image/x-icon" />
   <link href="https://fonts.cdnfonts.com/css/avenir" rel="stylesheet" />
   <title>Inventaris</title>
 
@@ -61,7 +61,7 @@
     .loading-overlay {
       background: rgba(15, 23, 42, 0.7); /* Navy transparan */
       backdrop-filter: blur(10px); /* Efek mewah Glassmorphism */
-      display: none; 
+      display: none;
       flex-direction: column;
       justify-content: center;
       align-items: center;
@@ -108,7 +108,7 @@
       border-radius: 12px;
       width: 100% !important;
       /* Hapus height tetap atau sesuaikan agar lebih tinggi */
-      aspect-ratio: 1 / 1; 
+      aspect-ratio: 1 / 1;
       overflow: hidden;
       background: #000 !important;
     }
@@ -139,7 +139,7 @@
   <div id="loading-animation" class="loading-overlay fixed inset-0">
     <div class="loader-content">
       <span class="logo-container bg-blue-900 p-3 shadow-2xl">
-        <img src="{{ asset('img/assets/bmn_logo.png') }}" class="h-10" alt="BMN" />
+        <img src="{{ asset('img/assets/logo_esimba_whitebg.png') }}" class="h-10" alt="BMN" />
       </span>
       <p class="loader-text font-semibold">Mengalihkan Halaman...</p>
     </div>
@@ -152,7 +152,7 @@
         <div class="flex items-center justify-start rtl:justify-end">
           <p class="flex ms-2 md:me-24">
             <span class="logo-container bg-blue-900 p-1 me-3">
-              <img src="{{ asset('img/assets/logo_bmn_white.png') }}" class="h-6 animate-logo" alt="BMN" />
+              <img src="{{ asset('img/assets/logo_esimba_whitebg.png') }}" class="h-6 animate-logo" alt="BMN" />
             </span>
             <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">
               <small class="text-xs text-white font-thin">Version 1.0</small>
@@ -279,13 +279,13 @@
       html5QrCode = new Html5Qrcode("reader");
       scanningActive = true;
 
-      const config = { 
-        fps: 20, 
+      const config = {
+        fps: 20,
         qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0 
+        aspectRatio: 1.0
       };
 
-      const cameraConfig = { 
+      const cameraConfig = {
         facingMode: "environment",
         videoConstraints: {
           width: { min: 640, ideal: 1280 },

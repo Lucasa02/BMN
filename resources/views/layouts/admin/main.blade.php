@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
   {{-- Favicon --}}
-  <link rel="shortcut icon" href="{{ asset('img/assets/logo_bmn_bg.png') }}" type="image/x-icon">
+  <link rel="shortcut icon" href="{{ asset('img/assets/bg_esimba.png') }}" type="image/x-icon">
 
   {{-- TinyMCE Configuration --}}
   <x-head.tinymce-config />

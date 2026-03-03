@@ -21,6 +21,16 @@
             }
         }
 
+        /* Animasi masuk untuk tombol filter (BARU) */
+        @keyframes scaleIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .filter-action-enter {
+            animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
         .animate-card {
             animation: fadeInUp 0.5s ease backwards;
         }
@@ -113,80 +123,96 @@
 
         {{-- SEARCH & FILTER BAR --}}
         <form id="filterForm" class="mb-8" action="{{ url()->current() }}" method="GET">
-    <div class="bg-white p-2 md:p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-col lg:flex-row items-center gap-3">
+            <div class="bg-white p-2 md:p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-col lg:flex-row items-center gap-3">
 
-        {{-- Group 1: Search & Sort --}}
-        <div class="flex items-center gap-2 w-full lg:w-1/3">
-            <div class="relative flex-1">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-magnifying-glass text-xs text-gray-400"></i>
+                {{-- Group 1: Search & Sort --}}
+                <div class="flex items-center gap-2 w-full lg:w-1/3">
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-magnifying-glass text-xs text-gray-400"></i>
+                        </div>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            class="block w-full pl-10 pr-4 py-2.5 bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] rounded-xl text-sm transition-all"
+                            placeholder="Cari aset...">
+                    </div>
+
+                    <select name="sort" onchange="this.form.submit()"
+                        class="w-32 bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] text-gray-600 text-xs font-bold rounded-xl py-2.5 transition-all cursor-pointer">
+                        <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>A - Z</option>
+                        <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Z - A</option>
+                    </select>
                 </div>
-                <input type="text" name="search" value="{{ request('search') }}"
-                    class="block w-full pl-10 pr-4 py-2.5 bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] rounded-xl text-sm transition-all"
-                    placeholder="Cari aset...">
-            </div>
 
-            <select name="sort" onchange="this.form.submit()"
-                class="w-32 bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] text-gray-600 text-xs font-bold rounded-xl py-2.5 transition-all cursor-pointer">
-                <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>A - Z</option>
-                <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Z - A</option>
-            </select>
-        </div>
+                {{-- Divider Line (Desktop Only) --}}
+                <div class="hidden lg:block w-px h-8 bg-gray-100"></div>
 
-        {{-- Divider Line (Desktop Only) --}}
-        <div class="hidden lg:block w-px h-8 bg-gray-100"></div>
+                {{-- Group 2: Dynamic Filters --}}
+                <div class="flex flex-col sm:flex-row items-center gap-2 w-full lg:flex-1">
+                    <div class="grid grid-cols-2 gap-2 w-full">
+                        {{-- Tipe Filter --}}
+                        <select id="filter_type" name="filter_type"
+                            class="bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] text-gray-600 text-xs font-semibold rounded-xl py-2.5 transition-all cursor-pointer">
+                            <option value="">Semua Filter</option>
+                            <option value="ruangan" {{ request('filter_type') == 'ruangan' ? 'selected' : '' }}>Ruangan</option>
+                            <option value="kategori" {{ request('filter_type') == 'kategori' ? 'selected' : '' }}>Kategori</option>
+                            <option value="unit_kerja" {{ request('filter_type') == 'unit_kerja' ? 'selected' : '' }}>Unit Kerja</option>
+                        </select>
 
-        {{-- Group 2: Dynamic Filters --}}
-        <div class="flex flex-col sm:flex-row items-center gap-2 w-full lg:flex-1">
-            <div class="grid grid-cols-2 gap-2 w-full">
-                {{-- Tipe Filter --}}
-                <select id="filter_type" name="filter_type"
-                    class="bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] text-gray-600 text-xs font-semibold rounded-xl py-2.5 transition-all cursor-pointer">
-                    <option value="">Semua Filter</option>
-                    <option value="ruangan" {{ request('filter_type') == 'ruangan' ? 'selected' : '' }}>Ruangan</option>
-                    <option value="kategori" {{ request('filter_type') == 'kategori' ? 'selected' : '' }}>Kategori</option>
-                    <option value="unit_kerja" {{ request('filter_type') == 'unit_kerja' ? 'selected' : '' }}>Unit Kerja</option>
-                </select>
+                        {{-- Nilai Filter --}}
+                        <select id="filter_value" name="filter_value" onchange="this.form.submit()"
+                            class="bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] text-gray-600 text-xs font-semibold rounded-xl py-2.5 transition-all cursor-pointer {{ !request('filter_type') ? 'opacity-50' : '' }}"
+                            {{ !request('filter_type') ? 'disabled' : '' }}>
+                            <option value="">Pilih Data...</option>
+                            @if(request('filter_type') == 'ruangan')
+                                @foreach($list_ruangan as $r)
+                                    <option value="{{ $r->nama_ruangan }}" {{ request('filter_value') == $r->nama_ruangan ? 'selected' : '' }}>{{ $r->nama_ruangan }}</option>
+                                @endforeach
+                            @elseif(request('filter_type') == 'kategori')
+                                @foreach($list_kategori as $k)
+                                    <option value="{{ $k->nama_kategori }}" {{ request('filter_value') == $k->nama_kategori ? 'selected' : '' }}>{{ $k->nama_kategori }}</option>
+                                @endforeach
+                            @elseif(request('filter_type') == 'unit_kerja')
+                                @foreach($list_unit_kerja as $u)
+                                    <option value="{{ $u->nama_unit_kerja }}" {{ request('filter_value') == $u->nama_unit_kerja ? 'selected' : '' }}>{{ $u->nama_unit_kerja }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                </div>
 
-                {{-- Nilai Filter --}}
-                <select id="filter_value" name="filter_value" onchange="this.form.submit()"
-                    class="bg-gray-50/50 border-none focus:ring-2 focus:ring-[#1b365d] text-gray-600 text-xs font-semibold rounded-xl py-2.5 transition-all cursor-pointer {{ !request('filter_type') ? 'opacity-50' : '' }}"
-                    {{ !request('filter_type') ? 'disabled' : '' }}>
-                    <option value="">Pilih Data...</option>
-                    @if(request('filter_type') == 'ruangan')
-                        @foreach($list_ruangan as $r)
-                            <option value="{{ $r->nama_ruangan }}" {{ request('filter_value') == $r->nama_ruangan ? 'selected' : '' }}>{{ $r->nama_ruangan }}</option>
-                        @endforeach
-                    @elseif(request('filter_type') == 'kategori')
-                        @foreach($list_kategori as $k)
-                            <option value="{{ $k->nama_kategori }}" {{ request('filter_value') == $k->nama_kategori ? 'selected' : '' }}>{{ $k->nama_kategori }}</option>
-                        @endforeach
-                    @elseif(request('filter_type') == 'unit_kerja')
-                        @foreach($list_unit_kerja as $u)
-                            <option value="{{ $u->nama_unit_kerja }}" {{ request('filter_value') == $u->nama_unit_kerja ? 'selected' : '' }}>{{ $u->nama_unit_kerja }}</option>
-                        @endforeach
+                {{-- Group 3: Actions --}}
+                <div class="flex items-center gap-2 w-full lg:w-auto">
+                    <button type="submit"
+                        class="flex-1 lg:flex-none bg-[#1b365d] hover:bg-[#2d5a9e] text-white px-6 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm">
+                        Terapkan
+                    </button>
+
+                    @if(request()->anyFilled(['search', 'filter_type', 'filter_value']))
+                        {{-- Tombol PDF Berdasarkan Filter --}}
+                        <a href="{{ route('barang.print-barang', array_merge(request()->query(), ['kategori' => 'bmn', 'ruangan' => request('filter_type') == 'ruangan' ? request('filter_value') : 'all'])) }}"
+                            target="_blank"
+                            class="filter-action-enter p-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl transition-all shadow-sm"
+                            title="Cetak PDF Hasil Filter">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </a>
+
+                        {{-- Tombol QR Berdasarkan Filter --}}
+                        <a href="{{ route('barang.print-qrcode', array_merge(request()->query(), ['kategori' => 'bmn', 'ruangan' => request('filter_type') == 'ruangan' ? request('filter_value') : 'all'])) }}"
+                            target="_blank"
+                            class="filter-action-enter p-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-xl transition-all shadow-sm"
+                            title="Cetak QR Hasil Filter">
+                            <i class="fa-solid fa-qrcode"></i>
+                        </a>
+
+                        <a href="{{ route('barang.bmn_index') }}"
+                            class="filter-action-enter p-2.5 text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all"
+                            title="Reset Semua">
+                            <i class="fa-solid fa-filter-circle-xmark"></i>
+                        </a>
                     @endif
-                </select>
+                </div>
             </div>
-        </div>
-
-        {{-- Group 3: Actions --}}
-        <div class="flex items-center gap-2 w-full lg:w-auto">
-            <button type="submit"
-                class="flex-1 lg:flex-none bg-[#1b365d] hover:bg-[#2d5a9e] text-white px-6 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm">
-                Terapkan
-            </button>
-
-            @if(request()->anyFilled(['search', 'filter_type', 'filter_value']))
-                <a href="{{ route('barang.bmn_index') }}"
-                    class="p-2.5 text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all"
-                    title="Reset Semua">
-                    <i class="fa-solid fa-filter-circle-xmark"></i>
-                </a>
-            @endif
-        </div>
-    </div>
-</form>
+        </form>
 
         {{-- GRID CARDS --}}
         @if ($barang->isEmpty())
@@ -245,7 +271,7 @@
                                         <span class="text-[11px] font-bold truncate">{{ $b->ruangan }}</span>
                                     </div>
 
-                                    {{-- UNIT KERJA (DESIGN BARU - LEBIH TERLIHAT) --}}
+                                    {{-- UNIT KERJA --}}
                                     <div class="flex items-center gap-2 text-[#1b365d]">
                                       <div class="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center">
                                           <i class="fa-solid fa-building-user text-[10px]"></i>
@@ -292,7 +318,7 @@
         </div>
     </div>
 
-    {{-- MODAL CETAK --}}
+    {{-- MODAL CETAK (LAMA) --}}
     <div id="print-modal" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full backdrop-blur-md bg-gray-900/40 transition-all duration-300">
         <div class="relative p-4 w-full max-w-md max-h-full animate-card">
@@ -399,18 +425,18 @@
 @endsection
 
 @section('scripts')
-    <script>
-        document.getElementById('filter_type').addEventListener('change', function() {
+<script>
+    // 1. Logika Filter Dinamis
+    document.getElementById('filter_type').addEventListener('change', function() {
         const type = this.value;
         const valueSelect = document.getElementById('filter_value');
 
-        // Reset dropdown
         valueSelect.innerHTML = '<option value="">Pilih Data...</option>';
 
         if (!type) {
             valueSelect.disabled = true;
             valueSelect.classList.add('opacity-50');
-            this.form.submit(); // Reset filter jika memilih "Semua Filter"
+            window.location.href = "{{ route('barang.bmn_index') }}";
             return;
         }
 
@@ -418,7 +444,6 @@
         valueSelect.classList.remove('opacity-50');
 
         let options = [];
-        // Menggunakan data yang sudah dipassing dari Controller
         if (type === 'ruangan') {
             options = @json($list_ruangan->pluck('nama_ruangan'));
         } else if (type === 'kategori') {
@@ -431,10 +456,22 @@
             const el = document.createElement('option');
             el.value = opt;
             el.textContent = opt;
-            // Pertahankan seleksi jika ada
             if(opt === "{{ request('filter_value') }}") el.selected = true;
             valueSelect.appendChild(el);
         });
     });
-    </script>
+
+    // 2. Fungsi Submit Print
+    function submitPrint(actionUrl) {
+        const form = document.getElementById('printForm');
+        form.action = actionUrl;
+        form.submit();
+    }
+
+    // 3. Fungsi Confirm Delete
+    function confirmDelete(url) {
+        const form = document.getElementById('deleteForm');
+        form.action = url;
+    }
+</script>
 @endsection

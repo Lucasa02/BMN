@@ -13,7 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="shortcut icon" href="{{ asset('img/assets/esimprod_logo_bg.png') }}" type="image/x-icon">
+  <link rel="shortcut icon" href="{{ asset('img/assets/bg_esimba.png') }}" type="image/x-icon">
 
   <link rel="shortcut icon" href="{{ asset('/favicon.ico') }}" type="image/x-icon">
   <link href="https://fonts.cdnfonts.com/css/avenir" rel="stylesheet">
@@ -29,10 +29,10 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center justify-start rtl:justify-end">
           <p class="flex ms-2 md:me-24">
-            <img src="{{ asset('img/assets/esimprod_logo.png') }}" class="h-8 me-3 bg-blue-900 p-1 rounded-lg"
+            <img src="{{ asset('img/assets/logo_esimba_whitebg.png') }}" class="h-8 me-3 bg-blue-900 p-1 rounded-lg"
               alt="ESIMPROD" />
             <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">
-              <small class="text-xs text-white font-thin">Version 3.0</small>
+              <small class="text-xs text-white font-thin">Version 1.0</small>
             </span>
           </p>
         </div>

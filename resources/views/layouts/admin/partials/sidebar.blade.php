@@ -80,9 +80,8 @@
                         id="arrow-bmn"></i>
                 </button>
 
-                {{-- Hapus users.* dari pengecekan routeIs di bawah ini --}}
                 <ul id="dropdown-bmn"
-                    class="{{ request()->routeIs('barang.bmn_index', 'bmn.ruangan.*', 'bmn.kategori.*', 'bmn.jenis_kerusakan.*', 'jabatan.*') ? 'block' : 'hidden' }} py-2 space-y-1 ml-4 border-l border-white/10 mt-1">
+                    class="{{ request()->routeIs('barang.bmn_index', 'bmn.ruangan.*', 'bmn.kategori.*', 'bmn.pengguna.*', 'bmn.unit_kerja.*', 'bmn.jenis_kerusakan.*', 'jabatan.*') ? 'block' : 'hidden' }} py-2 space-y-1 ml-4 border-l border-white/10 mt-1">
                     <li>
                         <a href="{{ route('barang.bmn_index') }}"
                             class="flex items-center p-2 pl-6 rounded-lg text-xs {{ request()->routeIs('barang.bmn_index') ? 'text-white font-bold' : 'text-white/60 hover:text-white' }}">

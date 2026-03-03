@@ -89,7 +89,7 @@
 
         /* Penyesuaian Ukuran Logo Esimprod BMN */
         .img-logo-esimprod {
-            height: 28px;
+            height: 30px;
             /* Sedikit diperbesar agar teks BMN terbaca jelas */
             width: auto;
         }
@@ -129,7 +129,7 @@
                     }
 
                     $logoTvri = public_path('img/assets/logo_tvri_icon.png');
-                    $logoEsimprod = public_path('img/assets/logo_esimprod_bmn.png');
+                    $logoEsimprod = public_path('img/assets/logo_esimba_bluebg.png');
                 @endphp
                 <tr>
                     <td>

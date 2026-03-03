@@ -8,12 +8,12 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 animate-reveal">
             <div>
                 <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                    Dashboard <span class="text-primary bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500">Inventara</span>
+                    Dashboard <span class="text-[#1b365d] bg-clip-text text-transparent bg-gradient-to-r from-[#1b365d] to-[#2d5a9e]">ESIMBA</span>
                 </h1>
                 <p class="text-slate-500 dark:text-slate-400 mt-1 font-medium">Selamat datang kembali, berikut ringkasan aset Anda hari ini.</p>
             </div>
             <div class="flex items-center gap-3 bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/50">
-                <div class="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600">
+                <div class="p-2 bg-[#1b365d]/10 dark:bg-[#1b365d]/30 rounded-lg text-[#1b365d] dark:text-blue-400">
                     <span class="material-symbols-outlined text-[20px]">calendar_today</span>
                 </div>
                 <div class="pr-4">
@@ -25,7 +25,7 @@
 
         {{-- Hero Slider Section (Bento Style) --}}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-8 relative group rounded-[2rem] overflow-hidden shadow-2xl shadow-blue-500/10 border border-white dark:border-slate-800 animate-reveal delay-100">
+            <div class="lg:col-span-8 relative group rounded-[2rem] overflow-hidden shadow-2xl shadow-[#1b365d]/10 border border-white dark:border-slate-800 animate-reveal delay-100">
                 <div id="hero-slider" class="absolute inset-0 z-0">
                     @if ($slider_images->isEmpty())
                         <div class="absolute inset-0 bg-cover bg-center active-slide slider-item"
@@ -42,14 +42,14 @@
                 </div>
 
                 {{-- Overlay & Content --}}
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent z-10"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#1b365d]/90 via-[#1b365d]/20 to-transparent z-10"></div>
                 <div class="absolute bottom-0 left-0 p-8 z-20 w-full flex justify-between items-end">
                     <div class="space-y-2">
-                        <span class="px-3 py-1 bg-blue-500/20 backdrop-blur-md border border-white/20 text-blue-200 text-xs font-bold rounded-full uppercase tracking-widest">Featured Assets</span>
+                        <span class="px-3 py-1 bg-[#1b365d]/30 backdrop-blur-md border border-white/20 text-blue-100 text-xs font-bold rounded-full uppercase tracking-widest">Featured Assets</span>
                         <h2 class="text-2xl md:text-3xl font-bold text-white">Kelola Inventaris Lebih Efisien</h2>
                     </div>
                     <a href="{{ route('slider.index') }}"
-                       class="group/btn flex items-center gap-2 bg-white/10 hover:bg-white backdrop-blur-xl border border-white/30 hover:border-white text-white hover:text-blue-600 px-6 py-3 rounded-2xl transition-all duration-300 font-bold shadow-xl">
+                       class="group/btn flex items-center gap-2 bg-white/10 hover:bg-white backdrop-blur-xl border border-white/30 hover:border-white text-white hover:text-[#1b365d] px-6 py-3 rounded-2xl transition-all duration-300 font-bold shadow-xl">
                         <span class="material-symbols-outlined group-hover/btn:rotate-180 transition-transform duration-500">settings</span>
                     </a>
                 </div>
@@ -57,16 +57,15 @@
 
             {{-- Quick Stats Sidebar Bento --}}
             <div class="lg:col-span-4 grid grid-cols-1 gap-6">
-                <div class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[2rem] p-8 text-white relative overflow-hidden group animate-reveal delay-200">
+                <div class="bg-gradient-to-br from-[#1b365d] to-[#2d5a9e] rounded-[2rem] p-8 text-white relative overflow-hidden group animate-reveal delay-200">
                     <div class="relative z-10">
-                        <p class="text-indigo-100 font-medium opacity-80 text-sm">Total Pengguna Terdaftar</p>
+                        <p class="text-blue-100 font-medium opacity-80 text-sm">Total Pengguna Terdaftar</p>
                         <h3 class="text-5xl font-black mt-2 tracking-tighter">{{ $user }}</h3>
                         <div class="mt-8 flex -space-x-3">
-                            {{-- Placeholder for avatar users --}}
                             @for($i=0; $i<5; $i++)
-                            <div class="w-10 h-10 rounded-full border-2 border-indigo-500 bg-slate-200 flex items-center justify-center text-[10px] text-slate-600 font-bold">U</div>
+                            <div class="w-10 h-10 rounded-full border-2 border-[#1b365d] bg-slate-200 flex items-center justify-center text-[10px] text-slate-600 font-bold">U</div>
                             @endfor
-                            <div class="w-10 h-10 rounded-full border-2 border-indigo-500 bg-white/20 backdrop-blur-md flex items-center justify-center text-[10px] font-bold">+{{ $user }}</div>
+                            <div class="w-10 h-10 rounded-full border-2 border-[#1b365d] bg-white/20 backdrop-blur-md flex items-center justify-center text-[10px] font-bold">+{{ $user }}</div>
                         </div>
                     </div>
                     <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-[150px] opacity-10 group-hover:scale-110 transition-transform duration-700">group</span>
@@ -98,30 +97,29 @@
 
         {{-- Main Statistics Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
+
             {{-- Card: Barang --}}
             <div class="stat-card-premium animate-reveal delay-400 group">
                 <div class="flex justify-between items-center mb-6">
-                    <div class="p-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-2xl group-hover:scale-110 transition-transform">
+                    <div class="p-3 bg-[#1b365d]/10 dark:bg-[#1b365d]/30 text-[#1b365d] dark:text-blue-400 rounded-2xl group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined">inventory_2</span>
                     </div>
-                    <span class="text-xs font-bold px-3 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-full">Total BMN</span>
+                    <span class="text-xs font-bold px-3 py-1 bg-[#1b365d]/10 text-[#1b365d] dark:bg-[#1b365d]/40 dark:text-blue-200 rounded-full">Total BMN</span>
                 </div>
                 <h3 class="text-4xl font-black text-slate-800 dark:text-white">{{ $barang }}</h3>
                 <p class="text-slate-500 text-sm mt-1">Aset BMN terdaftar</p>
-                
+
                 <div class="mt-8 space-y-4">
                     @php
-                        // Hitung persentase barang dengan kondisi layak (Baik & Sangat Baik)
                         $available_pct = $barang > 0 ? ($barang_tersedia / $barang) * 100 : 0;
                     @endphp
                     <div class="space-y-2">
                         <div class="flex justify-between text-xs font-bold italic tracking-wide">
                             <span class="text-slate-600 dark:text-slate-400">KONDISI LAYAK</span>
-                            <span class="text-blue-600">{{ round($available_pct) }}%</span>
+                            <span class="text-[#1b365d] dark:text-blue-400">{{ round($available_pct) }}%</span>
                         </div>
                         <div class="w-full h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                            <div class="h-full bg-blue-500 rounded-full transition-all duration-1000" style="width: {{ $available_pct }}%"></div>
+                            <div class="h-full bg-[#1b365d] rounded-full transition-all duration-1000" style="width: {{ $available_pct }}%"></div>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100 dark:border-slate-700">
@@ -147,9 +145,8 @@
                 </div>
                 <h3 class="text-4xl font-black text-slate-800 dark:text-white">{{ $perawatan }}</h3>
                 <p class="text-slate-500 text-sm mt-1">Total aset dalam perbaikan</p>
-                
+
                 <div class="mt-8 grid grid-cols-1 gap-3">
-                    {{-- Status Pending --}}
                     <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-700">
                         <div class="flex items-center gap-3">
                             <div class="w-2 h-2 rounded-full bg-slate-400"></div>
@@ -157,11 +154,10 @@
                         </div>
                         <span class="text-lg font-bold text-slate-800 dark:text-white">{{ $perawatan_pending }}</span>
                     </div>
-                    
-                    {{-- Status Proses --}}
+
                     <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-700">
                         <div class="flex items-center gap-3">
-                            <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                            <div class="w-2 h-2 rounded-full bg-[#1b365d] animate-pulse"></div>
                             <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Sedang Dikerjakan</span>
                         </div>
                         <span class="text-lg font-bold text-slate-800 dark:text-white">{{ $perawatan_proses }}</span>
@@ -179,7 +175,7 @@
                 </div>
                 <h3 class="text-4xl font-black text-slate-800 dark:text-white">{{ $laporan_total }}</h3>
                 <p class="text-slate-500 text-sm mt-1">Total aduan kerusakan</p>
-                
+
                 <div class="mt-8 space-y-4">
                     <div class="flex justify-between items-center text-sm">
                         <span class="text-slate-500 italic">Rasio Persetujuan</span>
@@ -208,7 +204,6 @@
                         </a>
                     </div>
                 </div>
-            </div>
             </div>
 
         </div>
@@ -254,7 +249,7 @@
     .stat-card-premium:hover {
         transform: translateY(-10px);
         box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
-        border-color: #3182CE;
+        border-color: #1b365d; /* Menggunakan Navy Blue saat hover */
     }
 
     /* Slider Ken Burns */
@@ -282,16 +277,16 @@ document.addEventListener("DOMContentLoaded", function() {
         const activeSlide = slides[current];
         activeSlide.classList.remove("opacity-100", "z-10", "active-ken-burns");
         activeSlide.classList.add("opacity-0", "z-0");
-        
+
         current = (current + 1) % slides.length;
         const nextSlide = slides[current];
 
         nextSlide.classList.remove("opacity-0", "z-0");
         nextSlide.classList.add("opacity-100", "z-10");
-        
-        void nextSlide.offsetWidth; 
+
+        void nextSlide.offsetWidth;
         nextSlide.classList.add("active-ken-burns");
-    }, 6000); 
+    }, 6000);
 });
 </script>
 @endsection

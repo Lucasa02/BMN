@@ -4,7 +4,7 @@
     <title>Data Penghapusan</title>
     <style>
         body { font-family: sans-serif; color: #333; }
-        
+
         /* Style untuk Header Logo & Judul */
         .header-table {
             width: 100%;
@@ -28,16 +28,16 @@
             text-align: center;
             width: 60%;
         }
-        
+
         /* Ukuran Logo TVRI */
         .logo-tvri {
             height: 40px;
             width: auto;
         }
-        
+
         /* Ukuran Logo Esimprod (Dibuat lebih kecil) */
         .logo-esimprod {
-            height: 32px; 
+            height: 32px;
             width: auto;
         }
 
@@ -49,25 +49,25 @@
         }
 
         /* Style Tabel Data */
-        .data-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 10px; 
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
         }
-        .data-table th, .data-table td { 
-            border: 1px solid #ccc; 
-            padding: 10px 8px; 
-            font-size: 12px; 
+        .data-table th, .data-table td {
+            border: 1px solid #ccc;
+            padding: 10px 8px;
+            font-size: 12px;
         }
-        
+
         /* Header Tabel Berwarna #1b365d */
-        .data-table th { 
-            background-color: #1b365d; 
-            color: white; 
+        .data-table th {
+            background-color: #1b365d;
+            color: white;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
+
         hr {
             border: 0;
             border-top: 2px solid #1b365d; /* Mengikuti warna tema */
@@ -86,7 +86,7 @@
                 <h2 class="title-text">Data Penghapusan Barang</h2>
             </td>
             <td class="logo-right">
-                <img src="{{ public_path('img/assets/esimprod_logo.png') }}" class="logo-esimprod">
+                <img src="{{ public_path('img/assets/logo_esimba_bluebg.png') }}" class="logo-esimprod">
             </td>
         </tr>
     </table>
