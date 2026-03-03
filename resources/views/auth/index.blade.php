@@ -30,9 +30,13 @@
             animation: gradientBG 15s ease infinite;
         }
 
-        .bmn-pattern {
-            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.08'%3E%3Cpath d='M40 40c0-11.046-8.954-20-20-20S0 28.954 0 40s8.954 20 20 20 20-8.954 20-20zm40 0c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zM0 0c0 11.046 8.954 20 20 20s20-8.954 20-20-8.954-20-20-20S0-11.046 0 0zm40 0c0 11.046 8.954 20 20 20s20-8.954 20-20-8.954-20-20-20-20 8.954-20 20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
+        /* Update pada class .bmn-pattern */
+.bmn-pattern {
+    /* stroke-width dinaikkan ke 0.8 dan stroke-opacity ke 0.15 */
+    background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23ffffff' stroke-width='0.8' stroke-opacity='0.15'%3E%3Cpath d='M40 40c0-11.046-8.954-20-20-20S0 28.954 0 40s8.954 20 20 20 20-8.954 20-20zm40 0c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zM0 0c0 11.046 8.954 20 20 20s20-8.954 20-20-8.954-20-20-20S0-11.046 0 0zm40 0c0 11.046 8.954 20 20 20s20-8.954 20-20-8.954-20-20-20-20 8.954-20 20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    mask-image: linear-gradient(to right, black 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
+}
 
         #three-canvas-container {
             width: 100%;
@@ -97,16 +101,18 @@
         <div class="fixed inset-0 animated-gradient"></div>
         <div class="fixed inset-0 bmn-pattern"></div>
         <div class="fixed inset-0 opacity-20" style="background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1px, transparent 0); background-size: 30px 30px;"></div>
+        <div class="fixed inset-0 opacity-40" style="background-image: radial-gradient(circle at 25% 50%, rgba(59, 130, 246, 0.4) 0%, transparent 60%);"></div>
 
         {{-- Left Side: 3D Animation (Hidden on mobile) --}}
         <div class="hidden md:flex md:w-1/2 relative items-center justify-center p-12 overflow-hidden">
             <div id="three-canvas-container"></div>
             <div class="relative z-10 text-white max-w-lg pointer-events-none select-none">
-                <div class="flex items-center gap-1 mb-8">
+                <div class="flex items-center gap-4 mb-8">
                     <div class="w-14 h-14 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/20 shadow-xl">
                         <i data-lucide="building-2" class="w-8 h-8 text-white"></i>
                     </div>
-                    <img src="{{ asset('img/assets/logo_esimba_whitebg.png') }}" alt="Logo ESIMBA" class="h-16 w-auto object-contain -ml-1">
+                    {{-- Ganti -ml-1 (margin kiri negatif) menjadi ml-2 (margin kiri positif) --}}
+                    <img src="{{ asset('img/assets/logo_esimba_whitebg.png') }}" alt="Logo ESIMBA" class="h-12 w-auto object-contain ml-2">
                 </div>
                 <h2 class="text-3xl font-bold mb-4 leading-tight">
                     Sistem Informasi<br />
