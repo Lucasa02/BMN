@@ -31,12 +31,11 @@
         }
 
         /* Update pada class .bmn-pattern */
-.bmn-pattern {
-    /* stroke-width dinaikkan ke 0.8 dan stroke-opacity ke 0.15 */
-    background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23ffffff' stroke-width='0.8' stroke-opacity='0.15'%3E%3Cpath d='M40 40c0-11.046-8.954-20-20-20S0 28.954 0 40s8.954 20 20 20 20-8.954 20-20zm40 0c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zM0 0c0 11.046 8.954 20 20 20s20-8.954 20-20-8.954-20-20-20S0-11.046 0 0zm40 0c0 11.046 8.954 20 20 20s20-8.954 20-20-8.954-20-20-20-20 8.954-20 20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    mask-image: linear-gradient(to right, black 70%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
-}
+        .bmn-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23ffffff' stroke-width='0.8' stroke-opacity='0.15'%3E%3Cpath d='M40 40c0-11.046-8.954-20-20-20S0 28.954 0 40s8.954 20 20 20 20-8.954 20-20zm40 0c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zM0 0c0 11.046 8.954 20 20 20s20-8.954 20-20-8.954-20-20-20S0-11.046 0 0zm40 0c0 11.046 8.954 20 20 20s20-8.954 20-20-8.954-20-20-20-20 8.954-20 20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            mask-image: linear-gradient(to right, black 70%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
+        }
 
         #three-canvas-container {
             width: 100%;

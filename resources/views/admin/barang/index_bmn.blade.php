@@ -2,6 +2,18 @@
 
 @section('content')
     <style>
+      /* Tambahkan rule global untuk halaman ini */
+        .poppins-wrapper {
+            font-family: 'Poppins', sans-serif !important;
+        }
+
+        /* Memastikan elemen form juga terkena efeknya */
+        .poppins-wrapper input,
+        .poppins-wrapper select,
+        .poppins-wrapper button,
+        .poppins-wrapper textarea {
+            font-family: 'Poppins', sans-serif !important;
+        }
         /* Animasi muncul dari bawah untuk card */
         @keyframes fadeInUp {
             from {
@@ -73,7 +85,7 @@
         $ruanganNames = $list_ruangan->pluck('nama_ruangan')->toArray();
     @endphp
 
-    <div class="px-6 py-6 font-['Plus_Jakarta_Sans']">
+    <div class="px-6 py-6 poppins-wrapper">
         {{-- HEADER & TOOLS --}}
         <div
             class="glass-header sticky top-4 z-30 mb-8 p-4 rounded-2xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">

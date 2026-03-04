@@ -4,96 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Laporan Barang BMN' }}</title>
+    <link rel="shortcut icon" href="{{ asset('img/assets/bg_esimba.png') }}" type="image/x-icon">
     <style>
-        /* Margin diperkecil sedikit untuk memastikan konten fit di satu halaman */
-        @page { size: a4 landscape; margin: 0.8cm; }
+        @page {
+            size: a4 landscape;
+            margin: 0.8cm;
+            /* Tambah margin bawah sedikit lagi agar nomor halaman punya ruang aman */
+            margin-bottom: 1.5cm;
+        }
+
+        /* ... CSS lainnya tetap sama ... */
         * { font-family: "Calibri", Arial, sans-serif; box-sizing: border-box; }
         body { margin: 0; color: #111827; background-color: #fff; font-size: 11px; }
 
-        /* CSS untuk Cover */
-        .cover-page {
-            width: 100%;
-            text-align: center;
-            display: block;
-            padding-top: 50px;
-        }
-        .cover-title {
-            font-size: 32pt;
-            font-weight: bold;
-            margin-bottom: 5px;
-            letter-spacing: 2px;
-        }
-        .cover-subtitle {
-            font-size: 18pt;
-            font-weight: bold;
-            margin-bottom: 40px;
-            text-transform: uppercase;
-        }
-        .logo-container-cover {
-            margin: 50px 0;
-        }
-        .logo-large {
-            width: 300px;
-            height: auto;
-        }
-        .cover-footer {
-            margin-top: 60px;
-            font-size: 16pt;
-            font-weight: bold;
-            line-height: 1.5;
-            text-transform: uppercase;
-        }
+        .cover-page { width: 100%; text-align: center; display: block; padding-top: 50px; }
+        .cover-title { font-size: 32pt; font-weight: bold; margin-bottom: 5px; letter-spacing: 2px; }
+        .cover-subtitle { font-size: 18pt; font-weight: bold; margin-bottom: 40px; text-transform: uppercase; }
+        .logo-container-cover { margin: 50px 0; }
+        .logo-large { width: 300px; height: auto; }
+        .cover-footer { margin-top: 60px; font-size: 16pt; font-weight: bold; line-height: 1.5; text-transform: uppercase; }
 
-        .page-break {
-            page-break-before: always;
-            clear: both;
-        }
+        .page-break { page-break-before: always; clear: both; }
 
-        .col-nama {
-        width: 160px;
-        text-align: left !important; /* Menambahkan rata kiri */
-        padding-left: 8px !important; /* Memberi sedikit jarak dari garis tepi kiri agar lebih rapi */
-    }
-
-        /* Styling Table Data & Header */
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e5e7eb;
-        }
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; }
         .header-table td { border: none; vertical-align: middle; padding-bottom: 10px; }
         .header-left { text-align: left; width: 50%; }
         .header-right { text-align: right; width: 50%; }
-
-        /* Logo TVRI di header tetap 45px */
         .logo-img { height: 45px; width: auto; }
-
-        /* Class khusus untuk mengecilkan logo Esimprod (30px) */
         .logo-esimprod { height: 30px; width: auto; }
 
         table.data-table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
-        th {
-            background-color: #1b365d;
-            color: #ffffff;
-            padding: 10px 4px;
-            text-align: center;
-            border: 1px solid #000;
-            font-weight: bold;
-            font-size: 10px;
-            text-transform: uppercase;
-        }
+        th { background-color: #1b365d; color: #ffffff; padding: 10px 4px; text-align: center; border: 1px solid #000; font-weight: bold; font-size: 10px; text-transform: uppercase; }
         .data-table td { border: 1px solid #000; padding: 6px 4px; text-align: center; vertical-align: middle; word-wrap: break-word; font-size: 10px; }
-        .col-no { width: 25px; }        /* Diperkecil dari 30px */
-        .col-kode { width: 85px; }
-        .col-nup { width: 35px; }       /* Diperkecil sedikit dari 40px */
-        .col-nama { width: 160px; }     /* Dikurangi sedikit untuk memberi ruang ke Keterangan */
-        .col-merk { width: 90px; }      /* Dikurangi sedikit */
-        .col-kondisi { width: 65px; }
-        .col-tgl { width: 80px; }
-        .col-nilai { width: 95px; text-align: right !important; }
-        .col-ruang { width: 90px; }     /* Dikurangi sedikit */
-        .col-ket { width: 190px; }
+
+        .col-no { width: 3%; }       /* Dipersempit */
+        .col-kode { width: 10%; }
+        .col-nup { width: 4%; }      /* Dipersempit */
+        .col-nama { width: 15%; text-align: left !important; padding-left: 8px !important; }
+        .col-merk { width: 8%; }
+        .col-kondisi { width: 6%; }
+        .col-tgl { width: 8%; }
+        .col-nilai { width: 9%; text-align: right !important; }
+        .col-ruang { width: 9%; }
+        .col-ket { width: 28%; }
     </style>
 </head>
 <body>
@@ -120,6 +73,7 @@
 
     <div class="page-break"></div>
 
+    {{-- Halaman Data dimulai di sini --}}
     <table class="header-table">
         <tr>
             <td class="header-left">
@@ -130,7 +84,6 @@
             <td class="header-right">
                 @php $logoEsimprod = public_path('img/assets/logo_esimba_white.png'); @endphp
                 @if(file_exists($logoEsimprod))
-                    {{-- Menggunakan class logo-esimprod yang lebih kecil --}}
                     <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoEsimprod)) }}" class="logo-esimprod" alt="Logo Esimprod">
                 @endif
             </td>
@@ -148,8 +101,7 @@
                 <th class="col-kondisi">Kondisi</th>
                 <th class="col-tgl">Tanggal Perolehan</th>
                 <th class="col-nilai">Nilai Perolehan</th>
-                <th class="col-ruang">Lokasi /
-                  Pengguna</th>
+                <th class="col-ruang">Lokasi / Pengguna</th>
                 <th class="col-ket">Keterangan</th>
             </tr>
         </thead>
@@ -174,5 +126,30 @@
             @endforelse
         </tbody>
     </table>
+    <script type="text/php">
+        if (isset($pdf)) {
+            // Hilangkan get_canvas(), panggil langsung dari $pdf
+            $pdf->page_script('
+                if ($PAGE_NUM > 1) {
+                    // Gunakan getFont() camelCase dan font standar sans-serif
+                    $font = $fontMetrics->getFont("sans-serif", "bold");
+                    $size = 9;
+                    $color = array(0, 0, 0);
+
+                    // Matematika penomoran: Lewati cover (Halaman 1)
+                    $current = $PAGE_NUM - 1;
+                    $total = $PAGE_COUNT - 1;
+                    $text = $current . " / " . $total;
+
+                    // Posisi X tengah untuk A4 Landscape (~842pt)
+                    $x = 421 - 15;
+                    // Posisi Y bawah (~570pt)
+                    $y = 570;
+
+                    $pdf->text($x, $y, $text, $font, $size, $color);
+                }
+            ');
+        }
+    </script>
 </body>
 </html>

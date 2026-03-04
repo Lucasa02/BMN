@@ -328,17 +328,16 @@ class BarangController extends Controller
             return redirect()->back();
         }
 
-        // LOGIKA PEMILIHAN VIEW BERDASARKAN KATEGORI
         if ($kategori == 'bmn') {
-            // Jika BMN, gunakan print_filtered.blade.php (Pastikan key adalah 'data')
             $data = [
                 'data'    => $collection,
                 'ruangan' => $ruangan,
                 'title'   => 'Laporan Data Barang BMN'
             ];
-            $pdf = Pdf::loadView('admin.bmn.print_filtered', $data)->setPaper('a4', 'landscape');
+            $pdf = Pdf::loadView('admin.bmn.print_filtered', $data)
+            ->setPaper('a4', 'landscape')
+            ->setOptions(['isPhpEnabled' => true]);
         } else {
-            // Jika Master (atau all), gunakan barang_pdf.blade.php (Pastikan key adalah 'barang')
             $data = [
                 'barang'      => $collection,
                 'filter_info' => strtoupper($kategori),

@@ -498,6 +498,10 @@ class BmnController extends Controller
             'unit_kerja_pilihan' => 'required|exists:unit_kerjas,nama_unit_kerja',
             'foto'               => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'posisi'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'merk'               => 'nullable|string',
+            'nomor_seri'         => 'nullable|string',
+            'asal_pengadaan'     => 'nullable|string',
+            'catatan'            => 'nullable|string',
         ];
 
         if ($request->tipe_penempatan == 'lokasi') {
@@ -641,7 +645,8 @@ class BmnController extends Controller
         $title = 'Laporan BMN (Filtered) - ' . ucfirst($ruangan);
 
         $pdf = Pdf::loadView('admin.bmn.print_filtered', compact('data', 'ruangan', 'title'))
-            ->setPaper('a4', 'landscape');
+            ->setPaper('a4', 'landscape')
+            ->setOption(['isPhpEnabled' => true]);
 
         return $pdf->stream('Laporan_BMN_Filtered_' . ucfirst($ruangan) . '.pdf');
     }
