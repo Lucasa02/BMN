@@ -53,11 +53,11 @@
         }
 
         .id-card-front {
-            background-image: url('{{ public_path('img/assets/main-id-card-bg.png') }}');
+            background-image: url('{{ public_path('img/assets/id-card-main.jpeg') }}');
         }
 
         .id-card-back {
-            background-image: url('{{ public_path('img/assets/qr-code-bg.png') }}');
+            background-image: url('{{ public_path('img/assets/code-qr.jpeg') }}');
         }
 
         /* Konten Bagian Depan */
