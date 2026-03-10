@@ -164,7 +164,7 @@
                     <li>
                         <a href="{{ route('admin.laporan-kerusakan.index') }}"
                             class="flex items-center p-2 pl-6 rounded-lg text-xs {{ request()->routeIs('admin.laporan-kerusakan.*') ? 'text-white font-bold' : 'text-white/60 hover:text-white' }}">
-                            <i class="fa-solid fa-clipboard-list w-4 text-red-400 mr-3"></i> Laporan Kerusakan
+                            <i class="fa-solid fa-clipboard-list w-4 text-red-400 mr-3"></i> Laporan Kondisi Barang
                         </a>
                     </li>
                 </ul>

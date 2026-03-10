@@ -88,8 +88,12 @@ class OptionsController extends Controller
 		notify()->success('Profil berhasil diubah.');
 
 		// LOGIKA REDIRECT BARU:
-		if ($request->input('from') === 'inventaris') {
+		$from = $request->input('from');
+
+		if ($from === 'inventaris') {
 			return redirect()->route('user.inventaris');
+		} elseif ($from === 'teknisi') {
+			return redirect()->route('user.teknisi.index'); // Redirect ke dashboard teknisi
 		}
 
 		return redirect()->route('user.option');

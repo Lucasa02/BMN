@@ -4,6 +4,16 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    @php
+        // Logika internal untuk mendeteksi rencana penghapusan jika tidak dikirim dari controller
+        $isRencanaPenghapusan = $barang->perawatan
+            ->where('jenis_perawatan', 'rencana_penghapusan')
+            ->isNotEmpty();
+
+        // Sesuaikan flag maintenance agar tidak tumpang tindih dengan penghapusan
+        $showMaintenanceNotify = isset($sedang_maintenance) && $sedang_maintenance && !$isRencanaPenghapusan;
+    @endphp
+
     <div class="min-h-screen bg-[#f8fafc] dark:bg-[#0b1120] font-['Plus_Jakarta_Sans'] pb-20 overflow-x-hidden">
 
         {{-- High-End Decorative Top Bar --}}
@@ -36,6 +46,32 @@
                 </div>
             </div>
 
+            {{-- NOTIFIKASI RENCANA PENGHAPUSAN --}}
+            @if($isRencanaPenghapusan)
+                <div class="mb-8 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 p-5 rounded-[2rem] shadow-sm flex items-center gap-4" data-aos="fade-down">
+                    <div class="w-12 h-12 bg-red-100 dark:bg-red-800/50 rounded-2xl flex items-center justify-center text-red-600 dark:text-red-400">
+                        <span class="material-symbols-outlined animate-pulse">delete_sweep</span>
+                    </div>
+                    <div>
+                        <p class="font-black text-red-800 dark:text-red-300 uppercase tracking-widest text-sm">Status: Rencana Penghapusan</p>
+                        <p class="text-xs text-red-600 dark:text-red-400 mt-1 font-medium">Barang ini telah masuk dalam daftar rencana penghapusan aset. Segera lengkapi dokumen pendukung.</p>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Notifikasi Maintenance (Hanya muncul jika bukan rencana penghapusan) --}}
+            @if($showMaintenanceNotify)
+                <div class="mb-8 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-5 rounded-[2rem] shadow-sm flex items-center gap-4" data-aos="fade-down">
+                    <div class="w-12 h-12 bg-amber-100 dark:bg-amber-800/50 rounded-2xl flex items-center justify-center text-amber-600 dark:text-amber-400">
+                        <span class="material-symbols-outlined animate-spin-slow">engineering</span>
+                    </div>
+                    <div>
+                        <p class="font-black text-amber-800 dark:text-amber-300 uppercase tracking-widest text-sm">Status: Dalam Pemeliharaan</p>
+                        <p class="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">Aset ini sedang dalam antrean teknisi atau dalam proses perbaikan.</p>
+                    </div>
+                </div>
+            @endif
+
             {{-- Hero Section: Main Profile --}}
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-12">
 
@@ -46,7 +82,7 @@
                         <div class="relative bg-white dark:bg-slate-800 p-3 rounded-[2.8rem] shadow-2xl shadow-slate-200/50 dark:shadow-none border border-white dark:border-slate-700">
                             <div class="aspect-square rounded-[2.2rem] overflow-hidden bg-slate-50 dark:bg-[#0f172a] relative">
                                 @if ($barang->foto)
-                                    <img src="{{ asset('storage/' . $barang->foto) }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                                    <img src="{{ asset('storage/' . $barang->foto) }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 {{ $isRencanaPenghapusan ? 'grayscale opacity-75' : '' }}">
                                 @else
                                     <div class="w-full h-full flex flex-col items-center justify-center text-slate-200">
                                         <span class="material-symbols-outlined text-8xl">inventory_2</span>
@@ -60,7 +96,9 @@
                         <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4">
                             <div class="bg-white dark:bg-slate-800 px-6 py-3 rounded-2xl shadow-xl border border-slate-50 dark:border-slate-700 flex justify-between items-center">
                                 <span class="text-[10px] font-black uppercase text-slate-400">Kondisi</span>
-                                <span class="px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black">{{ $barang->kondisi }}</span>
+                                <span class="px-3 py-1 rounded-lg {{ $isRencanaPenghapusan ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600' }} dark:bg-emerald-500/10 dark:text-emerald-400 text-xs font-black">
+                                    {{ $isRencanaPenghapusan ? 'PENGHAPUSAN' : $barang->kondisi }}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -71,8 +109,8 @@
                     <div class="space-y-6">
                         <div class="inline-flex items-center gap-3 px-4 py-2 bg-[#1b365d]/5 dark:bg-blue-900/20 text-[#1b365d] dark:text-blue-300 rounded-xl border border-[#1b365d]/10">
                             <div class="flex gap-1">
-                                <div class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></div>
-                                <div class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse delay-75"></div>
+                                <div class="w-1.5 h-1.5 rounded-full {{ $isRencanaPenghapusan ? 'bg-red-400' : 'bg-blue-400' }} animate-pulse"></div>
+                                <div class="w-1.5 h-1.5 rounded-full {{ $isRencanaPenghapusan ? 'bg-red-600' : 'bg-blue-600' }} animate-pulse delay-75"></div>
                             </div>
                             <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Asset ID: {{ $barang->kode_barang }}</span>
                         </div>
@@ -82,7 +120,7 @@
                         </h1>
 
                         <p class="text-2xl text-slate-400 dark:text-slate-500 font-medium italic">
-                            {{ $barang->merk ?? 'Standard Issue' }} • <span class="text-[#1b365d] dark:text-blue-400">{{ $barang->kategori }}</span>
+                            {{ $barang->merk ?? 'Standard Issue' }} • <span class="{{ $isRencanaPenghapusan ? 'text-red-500' : 'text-[#1b365d]' }} dark:text-blue-400">{{ $barang->kategori }}</span>
                         </p>
 
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6">
@@ -214,22 +252,37 @@
                     {{-- Maintenance Action --}}
                     <div class="space-y-3">
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-4">Manajemen Operasional</p>
-                        <form action="{{ route('perawatan_inventaris.storeFromBarang', $barang->id) }}" method="POST">
-                            @csrf
-                            <button type="submit"
-                                class="w-full group flex items-center justify-between p-6 bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-amber-200 transition-all duration-300">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-amber-50 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center text-amber-500">
-                                        <span class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-700">build</span>
+
+                        {{-- JIKA RENCANA PENGHAPUSAN: MATIKAN TOMBOL MAINTENANCE --}}
+                        @if($isRencanaPenghapusan)
+                            <div class="w-full p-6 bg-red-50 dark:bg-red-900/30 rounded-[2rem] border border-dashed border-red-200 text-center">
+                                <span class="material-symbols-outlined text-red-500 text-3xl mb-2">auto_delete</span>
+                                <p class="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Aset Dalam Proses Penghapusan</p>
+                                <p class="text-[8px] text-red-400 uppercase mt-1">Opsi maintenance dinonaktifkan</p>
+                            </div>
+                        @elseif(isset($sedang_maintenance) && $sedang_maintenance)
+                            <div class="w-full p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] border border-dashed border-amber-200 text-center opacity-80">
+                                <span class="material-symbols-outlined text-amber-500 text-3xl mb-2">build_circle</span>
+                                <p class="text-[10px] font-bold text-slate-500 uppercase">Aset Sedang Diperbaiki</p>
+                            </div>
+                        @else
+                            <form action="{{ route('perawatan_inventaris.storeFromBarang', $barang->id) }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                    class="w-full group flex items-center justify-between p-6 bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-amber-200 transition-all duration-300">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-amber-50 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center text-amber-500">
+                                            <span class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-700">build</span>
+                                        </div>
+                                        <div class="text-left">
+                                            <h5 class="text-sm font-black text-slate-800 dark:text-white uppercase">Maintenance</h5>
+                                            <p class="text-[10px] text-slate-400 font-bold uppercase">Update Kondisi</p>
+                                        </div>
                                     </div>
-                                    <div class="text-left">
-                                        <h5 class="text-sm font-black text-slate-800 dark:text-white uppercase">Maintenance</h5>
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase">Update Kondisi</p>
-                                    </div>
-                                </div>
-                                <span class="material-symbols-outlined text-slate-300 group-hover:text-amber-500 transition-colors">chevron_right</span>
-                            </button>
-                        </form>
+                                    <span class="material-symbols-outlined text-slate-300 group-hover:text-amber-500 transition-colors">chevron_right</span>
+                                </button>
+                            </form>
+                        @endif
 
                         {{-- Delete Action --}}
                         <form action="{{ route('bmn.delete', [$ruangan, $barang->id]) }}" method="POST"

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\LaporanKerusakan;
-use App\Models\PerawatanInventaris;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -18,7 +17,7 @@ class LaporanKerusakanAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $title = "Laporan Kerusakan";
+        $title = "Laporan Kondisi Barang";
         return view('admin.laporan_kerusakan.index', compact('laporan', 'title'));
     }
 
@@ -26,7 +25,7 @@ class LaporanKerusakanAdminController extends Controller
     public function detail($uuid)
     {
         $laporan = LaporanKerusakan::with(['barang', 'user'])->where('uuid', $uuid)->firstOrFail();
-        $title = "Laporan Kerusakan";
+        $title = "Laporan Kondisi Barang";
         return view('admin.laporan_kerusakan.detail', compact('laporan', 'title'));
     }
 
@@ -34,19 +33,12 @@ class LaporanKerusakanAdminController extends Controller
     {
         $laporan = LaporanKerusakan::where('uuid', $uuid)->firstOrFail();
 
-        PerawatanInventaris::create([
-            'barang_id'         => $laporan->barang_id,
-            'tanggal_perawatan' => now(),
-            'jenis_perawatan'   => 'perbaikan',
-            'deskripsi'         => $laporan->deskripsi,
-            'foto_kerusakan'    => $laporan->foto,
-            'status'            => 'pending'
-        ]);
-
+        // Cukup ubah status laporan menjadi 'disetujui' agar muncul di halaman teknisi
         $laporan->update(['status' => 'disetujui']);
 
-        return redirect()->route('perawatan_inventaris.index')
-            ->with('success', 'Laporan disetujui dan berhasil dipindahkan ke daftar Perawatan.');
+        // Redirect kembali ke halaman laporan kerusakan admin (bukan perawatan inventaris)
+        return redirect()->route('admin.laporan-kerusakan.index')
+            ->with('success', 'Laporan disetujui dan berhasil diteruskan ke antrean Teknisi.');
     }
 
     public function tolak($uuid)

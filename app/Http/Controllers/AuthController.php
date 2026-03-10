@@ -66,18 +66,24 @@ class AuthController extends Controller
 			]);
 
 			//redirect
-			if ($user->role == 'admin' || $user->role == 'superadmin') {
-				return redirect()->route('password')->with('success', 'Berhasil, silahkan isi password anda');
-			} elseif ($user->role == 'user') {
+      if ($user->role == 'admin' || $user->role == 'superadmin') {
+        return redirect()->route('password')->with('success', 'Berhasil, silahkan isi password anda');
+      } elseif ($user->role == 'user') {
 
-    notify()->success('Login Berhasil, Selamat Datang ' . $user->nama_lengkap);
+        notify()->success('Login Berhasil, Selamat Datang ' . $user->nama_lengkap);
 
-				return redirect()->intended(
-					($user->jabatan && $user->jabatan->jabatan === 'Petugas Inventaris')
-						? route('user.inventaris')
-						: route('user.option')
-				);
-			}
+        return redirect()->intended(
+          ($user->jabatan && $user->jabatan->jabatan === 'Petugas Inventaris')
+            ? route('user.inventaris')
+            : route('user.option')
+        );
+      } elseif ($user->role == 'teknisi') {
+
+        // TAMBAHKAN BLOK INI UNTUK TEKNISI
+        notify()->success('Login Berhasil, Selamat Datang ' . $user->nama_lengkap);
+        return redirect()->route('user.teknisi.index');
+
+      }
 		}
 		return redirect()->back()->with('error', 'Kode user tidak terdaftar !');
 	}

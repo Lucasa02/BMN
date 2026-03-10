@@ -64,7 +64,6 @@
         .content-wrapper {
             position: absolute;
             top: 185px;
-            /* Disesuaikan agar pas di bawah teks ACCESS CARD */
             left: 0;
             width: 100%;
             text-align: center;
@@ -78,19 +77,15 @@
             display: inline-block;
             background-color: #ddd;
             border-radius: 0;
-            /* Menghapus kelengkungan agar kotak tajam */
             border: 1px solid #ccc;
-            /* Border tipis agar foto tidak 'mati' di background putih */
         }
 
         .details {
             padding: 0 20px;
             margin-top: 10px;
-            /* Jarak foto ke teks */
             white-space: normal;
         }
 
-        /* Menghilangkan margin dan merapatkan line-height agar teks 'mepet' */
         .user-name {
             font-family: 'Poppins', sans-serif;
             font-weight: bold;
@@ -100,6 +95,12 @@
             padding: 0;
             line-height: 0.9;
             color: #1a1a1a;
+            /* Mencegah teks terlalu panjang merusak layout */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
 
         .user-nip {
@@ -107,22 +108,21 @@
             font-size: 15px;
             color: #374151;
             margin: -2px 0;
-            /* Menghilangkan jarak atas-bawah */
             padding: 0;
             line-height: 1;
-            /* Sangat rapat */
         }
 
         .user-jabatan {
             font-family: 'Poppins', sans-serif;
             font-weight: bold;
             font-size: 17px;
-            color: #111827;
+            color: #1b365d; /* Menggunakan warna biru gelap yang elegan */
             margin: 0;
-            /* Menghilangkan jarak atas-bawah */
             padding: 0;
             line-height: 1;
             text-transform: capitalize;
+            /* Tambahan padding atas agar tidak terlalu mepet dengan NIP */
+            padding-top: 4px;
         }
 
         /* Konten Bagian Belakang (QR) */
@@ -150,13 +150,13 @@
             <div class="content-wrapper">
                 <div class="photo-container">
                     <img class="photo-img"
-                        src="{{ $user->foto ? public_path('storage/uploads/foto_user/' . $user->foto) : public_path('storage/uploads/foto_user/default.jpeg') }}"
+                        src="{{ $user->foto && $user->foto !== 'default.jpeg' ? public_path('storage/uploads/foto_user/' . $user->foto) : public_path('img/assets/default.jpeg') }}"
                         alt="Foto Profil" />
                 </div>
                 <div class="details">
                     <div class="user-name">{{ $user->nama_lengkap }}</div>
                     <div class="user-nip">NIP. {{ $user->nip }}</div>
-                    <div class="user-jabatan">{{ $user->jabatan->jabatan }}</div>
+                    <div class="user-jabatan">{{ $user->jabatan->jabatan ?? 'Pegawai' }}</div>
                 </div>
             </div>
         </div>

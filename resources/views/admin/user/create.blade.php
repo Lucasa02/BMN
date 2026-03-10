@@ -8,7 +8,7 @@
             <p class="text-sm text-gray-500 dark:text-gray-400">Silahkan isi formulir di bawah ini untuk mendaftarkan user baru ke dalam sistem.</p>
         </div>
         <div>
-            <a href="{{ route('users.index') }}" 
+            <a href="{{ route('users.index') }}"
                class="flex items-center px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-gray-50 transition-all duration-200">
                 <i class="fas fa-arrow-left mr-2 text-xs"></i> Kembali ke Daftar
             </a>
@@ -20,7 +20,7 @@
             <form action="{{ route('users.store') }}" enctype="multipart/form-data" method="POST">
                 @csrf
                 <div class="grid gap-6 sm:grid-cols-2">
-                    
+
                     <div class="sm:col-span-2">
                         <label for="nama_lengkap" class="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Nama Lengkap</label>
                         <div class="relative">
@@ -81,6 +81,7 @@
                             @endif
                             <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                             <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
+                            <option value="teknisi" {{ old('role') == 'teknisi' ? 'selected' : '' }}>Teknisi</option>
                         </select>
                         @error('role')
                             <p class="text-red-500 text-xs mt-1 italic">{{ $message }}</p>
@@ -129,7 +130,7 @@
     }
     .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
     .animate-fade-in { animation: fadeIn 0.4s ease-in; }
-    
+
     /* Custom Focus Style */
     input:focus, select:focus {
         outline: none;
@@ -145,7 +146,8 @@
         const passwordContainer = document.getElementById("passwordContainer");
         const passwordInput = document.getElementById("password");
 
-        if (roleSelect.value === "superadmin" || roleSelect.value === "admin") {
+        // Teknisi ditambahkan ke validasi jika mereka memerlukan password untuk login seperti admin
+        if (roleSelect.value === "superadmin" || roleSelect.value === "admin" || roleSelect.value === "teknisi") {
             passwordContainer.classList.remove("hidden");
             passwordInput.setAttribute("required", "required");
         } else {
@@ -157,16 +159,18 @@
     document.getElementById("role").addEventListener("change", togglePasswordVisibility);
     window.onload = togglePasswordVisibility;
 
-    function togglePassword() {
+    function togglePasswordVisibility() {
+        const roleSelect = document.getElementById("role");
+        const passwordContainer = document.getElementById("passwordContainer");
         const passwordInput = document.getElementById("password");
-        const eyeIcon = document.getElementById("eyeIcon");
 
-        if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            eyeIcon.classList.replace("fa-eye", "fa-eye-slash");
+        // Hapus "teknisi" dari pengecekan ini
+        if (roleSelect.value === "superadmin" || roleSelect.value === "admin") {
+            passwordContainer.classList.remove("hidden");
+            passwordInput.setAttribute("required", "required");
         } else {
-            passwordInput.type = "password";
-            eyeIcon.classList.replace("fa-eye-slash", "fa-eye");
+            passwordContainer.classList.add("hidden");
+            passwordInput.removeAttribute("required");
         }
     }
 </script>

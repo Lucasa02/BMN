@@ -9,7 +9,7 @@
             <h1 class="text-3xl font-bold text-gray-800 dark:text-white tracking-tight">Daftar Perawatan</h1>
             <p class="text-gray-500 dark:text-gray-400 mt-1">Pantau status pemeliharaan seluruh inventaris secara real-time.</p>
         </div>
-        
+
         <div class="flex gap-3">
         </div>
     </div>
@@ -39,12 +39,12 @@
             @endphp
 
             <div class="group bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 flex flex-col h-full transform hover:-translate-y-2">
-                
+
                 {{-- Foto Barang dengan Zoom Effect --}}
                 <div class="relative h-52 overflow-hidden">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    
-                    <img 
+
+                    <img
                         class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out {{ $row->barang->foto ? '' : 'grayscale' }}"
                         src="{{ $row->barang->foto ? asset('storage/'.$row->barang->foto) : asset('img/no-image.png') }}"
                         alt="{{ $row->barang->nama_barang }}"
@@ -58,7 +58,7 @@
                     </div>
 
                     {{-- Quick Action Eye --}}
-                    <a href="{{ route('perawatan_inventaris.detail', $row->id) }}" 
+                    <a href="{{ route('perawatan_inventaris.detail', $row->id) }}"
                        class="absolute bottom-4 right-4 z-20 p-3 bg-white text-blue-600 rounded-2xl shadow-xl translate-y-12 group-hover:translate-y-0 transition-transform duration-500 opacity-0 group-hover:opacity-100 hover:bg-blue-600 hover:text-white">
                         <i class="fa-solid fa-eye text-lg"></i>
                     </a>
@@ -85,23 +85,28 @@
 
                     {{-- Action Buttons --}}
                     <div class="mt-auto pt-4 border-t border-gray-50 dark:border-gray-700 grid grid-cols-1 gap-2">
-                        @if($row->status != 'proses' && $row->status != 'selesai')
+                        @if($row->status == 'pending')
                             <a href="{{ route('perawatan_inventaris.perbaiki', $row->id) }}"
-                                class="flex items-center justify-center gap-2 py-2.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
-                                <i class="fa-solid fa-screwdriver-wrench"></i> Mulai Perbaiki
+                                class="flex items-center justify-center gap-2 py-2.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                                <i class="fa-solid fa-pen-to-square"></i> Perbaiki Barang (Keluhan)
                             </a>
                         @endif
 
                         @if($row->status == 'proses')
-                            <a href="{{ route('perawatan_inventaris.selesaiForm', $row->id) }}"
-                                class="flex items-center justify-center gap-2 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold hover:bg-emerald-600 hover:text-white transition-all">
-                                <i class="fa-solid fa-check-double"></i> Selesaikan
-                            </a>
+                            {{-- Form Verifikasi Selesai dengan SweetAlert --}}
+                            <form action="{{ route('perawatan_inventaris.verifikasiSelesai', $row->id) }}" method="POST" class="w-full" id="form-verifikasi-{{ $row->id }}">
+                                @csrf
+                                <button type="button" onclick="konfirmasiVerifikasi('{{ $row->id }}')"
+                                    class="w-full flex items-center justify-center gap-2 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold hover:bg-emerald-600 hover:text-white transition-all shadow-sm cursor-pointer">
+                                    <i class="fa-solid fa-check-double"></i> Verifikasi Selesai Diperbaiki
+                                </button>
+                            </form>
                         @endif
 
                         @if($row->status != 'pending')
+                            {{-- Tombol Rencana Penghapusan dengan SweetAlert --}}
                             <a href="{{ route('perawatan_inventaris.hapuskan', $row->id) }}"
-                                onclick="return confirm('Yakin ingin mengajukan penghapusan?')"
+                                onclick="event.preventDefault(); konfirmasiPenghapusan(this.href)"
                                 class="flex items-center justify-center gap-2 py-2.5 text-red-500 hover:text-red-700 text-xs font-bold transition-colors">
                                 <i class="fa-solid fa-trash-can"></i> Rencana Penghapusan
                             </a>
@@ -129,5 +134,65 @@
         background: #334155;
     }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Konfirmasi Verifikasi Selesai (Tema Elegan BMN)
+    function konfirmasiVerifikasi(id) {
+        Swal.fire({
+            title: 'Verifikasi Perbaikan BMN?',
+            text: "Verifikasi Barang agar bisa digunakan kembali.",
+            icon: 'info',
+            iconColor: '#10b981', // Emerald 500
+            showCancelButton: true,
+            buttonsStyling: false, // Mematikan style bawaan agar tidak bentrok dengan Tailwind
+            confirmButtonText: '<i class="fa-solid fa-check-double mr-1"></i> Ya, Verifikasi',
+            cancelButtonText: 'Batal',
+            reverseButtons: true, // Memindah tombol Ya ke kanan
+            customClass: {
+                popup: 'rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6',
+                title: 'text-xl font-bold text-gray-800 dark:text-white mb-2',
+                htmlContainer: 'text-gray-500 dark:text-gray-400 text-sm',
+                actions: 'mt-6 w-full flex justify-center gap-3', // Container tombol
+                confirmButton: 'bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg', // Class Tailwind untuk Confirm
+                cancelButton: 'bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 font-semibold py-2.5 px-6 rounded-xl transition-all duration-300' // Class Tailwind untuk Cancel
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit form jika user klik 'Ya'
+                document.getElementById('form-verifikasi-' + id).submit();
+            }
+        });
+    }
+
+    // Konfirmasi Rencana Penghapusan (Tema Peringatan)
+    function konfirmasiPenghapusan(url) {
+        Swal.fire({
+            title: 'Ajukan Penghapusan BMN?',
+            html: "Barang ini akan dipindahkan ke daftar <b>Rencana Penghapusan</b>.<br>Tindakan ini memerlukan persetujuan lebih lanjut.",
+            icon: 'warning',
+            iconColor: '#ef4444', // Red 500
+            showCancelButton: true,
+            buttonsStyling: false, // Mematikan style bawaan agar tidak bentrok dengan Tailwind
+            confirmButtonText: '<i class="fa-solid fa-trash-can mr-1"></i> Ya, Ajukan',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            customClass: {
+                popup: 'rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6',
+                title: 'text-xl font-bold text-gray-800 dark:text-white mb-2',
+                htmlContainer: 'text-gray-500 dark:text-gray-400 text-sm',
+                actions: 'mt-6 w-full flex justify-center gap-3',
+                confirmButton: 'bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg', // Class Tailwind untuk Confirm
+                cancelButton: 'bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 font-semibold py-2.5 px-6 rounded-xl transition-all duration-300' // Class Tailwind untuk Cancel
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect ke URL penghapusan jika user klik 'Ya'
+                window.location.href = url;
+            }
+        });
+    }
+</script>
 
 @endsection

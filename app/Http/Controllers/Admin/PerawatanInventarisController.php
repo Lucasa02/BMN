@@ -7,13 +7,11 @@ use App\Models\PerawatanInventaris;
 use App\Models\BmnBarang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class PerawatanInventarisController extends Controller
 {
-    // ==============================
-    // LIST PERAWATAN
-    // ==============================
     public function index(Request $request) // Tambahkan Request $request untuk menangani filter jika diperlukan
     {
         $query = PerawatanInventaris::with('barang')
@@ -33,20 +31,14 @@ class PerawatanInventarisController extends Controller
         return view('admin.perawatan_inventaris.index', compact('data', 'title'));
     }
 
-    // ==============================
-    // DETAIL PERAWATAN
-    // ==============================
     public function detail($id)
     {
-        $data = PerawatanInventaris::with('barang')->findOrFail($id);
+        $data = PerawatanInventaris::with(['barang', 'user'])->findOrFail($id);
         $title = "Detail Perbaikan Barang";
 
         return view('admin.perawatan_inventaris.detail', compact('data', 'title'));
     }
 
-    // ==============================
-    // CEGAH INPUT GANDA
-    // ==============================
     private function cekBarangSudahDiproses($barang_id)
     {
         return PerawatanInventaris::where('barang_id', $barang_id)
@@ -54,13 +46,10 @@ class PerawatanInventarisController extends Controller
             ->exists();
     }
 
-    // ==============================
-    // MASUKKAN KE PERBAIKAN (dari halaman detail barang)
-    // ==============================
     public function storeFromBarang($barang_id)
     {
-        if ($this->cekBarangSudahDiproses($barang_id)) {
-            return back()->with('error', 'Barang ini sudah masuk proses perawatan atau penghapusan!');
+        if ($this->cekBarangSudahDiproses($barang_id) || \App\Models\LaporanKerusakan::where('barang_id', $barang_id)->whereIn('status', ['pending', 'disetujui'])->exists()) {
+            return back()->with('error', 'Barang ini sudah masuk proses perawatan atau sedang di antrean teknisi!');
         }
 
         PerawatanInventaris::create([
@@ -68,16 +57,12 @@ class PerawatanInventarisController extends Controller
             'barang_id' => $barang_id,
             'tanggal_perawatan' => now(),
             'jenis_perawatan' => 'perbaikan',
-            'status' => 'proses',
+            'status' => 'pending', // Pending agar menunggu admin menulis keluhan
         ]);
 
-        return back()->with('success', 'Barang berhasil dimasukkan ke perawatan.');
+        return redirect()->route('perawatan_inventaris.index')->with('success', 'Barang dialihkan ke daftar antrean. Silahkan Tulis Keluhan.');
     }
 
-    // ==============================
-    // FORM UNTUK MEMULAI / MENGUPDATE PERBAIKAN
-    // GET -> tampilkan form
-    // ==============================
     public function perbaikiForm($id)
     {
         $data = PerawatanInventaris::with('barang')->findOrFail($id);
@@ -85,43 +70,39 @@ class PerawatanInventarisController extends Controller
         return view('admin.perawatan_inventaris.perbaiki', compact('data', 'title'));
     }
 
-    // ==============================
-    // SUBMIT PERBAIKAN (simpan perubahan & set status proses)
-    // POST
-    // ==============================
     public function perbaikiSubmit(Request $request, $id)
     {
         $request->validate([
-            'catatan' => 'nullable|string',
-            'estimasi_biaya' => 'nullable|numeric',
-            'foto_kerusakan' => 'nullable|image|max:4096'
+            'keluhan' => 'required|string',
+            'foto'    => 'nullable|image|mimes:jpg,jpeg,png|max:4096' // Validasi file foto
         ]);
 
         $p = PerawatanInventaris::findOrFail($id);
 
-        // simpan foto kerusakan (opsional)
-        if ($request->hasFile('foto_kerusakan')) {
-            // hapus file lama jika ada
-            if ($p->foto_kerusakan ?? false) {
-                Storage::disk('public')->delete($p->foto_kerusakan);
-            }
-            $path = $request->file('foto_kerusakan')->store('perawatan/kerusakan', 'public');
-            $p->foto_kerusakan = $path;
+        // Proses simpan file foto jika ada
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('laporan_kerusakan', 'public');
         }
 
-        // update fields
-        $p->deskripsi = $request->catatan ?? $p->deskripsi;
-        $p->biaya = $request->estimasi_biaya ?? $p->biaya;
-        $p->status = 'proses';
-        $p->save();
+        // Buat Laporan Kerusakan berstatus disetujui agar langsung tampil di teknisi/index.blade.php
+        \App\Models\LaporanKerusakan::create([
+            'uuid'            => \Illuminate\Support\Str::uuid(),
+            'barang_id'       => $p->barang_id,
+            'user_id'         => Auth::id(), // Admin yang melapor
+            'jenis_kerusakan' => 'Maintenance',
+            'deskripsi'       => $request->keluhan,
+            'foto'            => $fotoPath, // Simpan path foto ke database
+            'status'          => 'disetujui'
+        ]);
 
-        return redirect()->route('perawatan_inventaris.detail', $p->id)
-                        ->with('success', 'Data perbaikan disimpan. Status: proses.');
+        // Hapus status dari PerawatanInventaris (akan dibuat ulang oleh Teknisi saat memproses)
+        $p->delete();
+
+        return redirect()->route('perawatan_inventaris.index')
+                        ->with('success', 'Keluhan berhasil disimpan dan telah dikirim ke halaman Teknisi.');
     }
 
-    // ==============================
-    // Ubah status langsung jadi 'proses' (alternatif cepat)
-    // ==============================
     public function perbaiki($id)
     {
         $p = PerawatanInventaris::findOrFail($id);
@@ -130,9 +111,6 @@ class PerawatanInventarisController extends Controller
         return back()->with('success', 'Barang mulai diperbaiki.');
     }
 
-    // ==============================
-    // PINDAHKAN KE RENCANA PENGHAPUSAN
-    // ==============================
     public function hapuskan($id)
     {
         $item = PerawatanInventaris::with('barang')->findOrFail($id);
@@ -164,46 +142,12 @@ class PerawatanInventarisController extends Controller
                     ->with('success', 'Barang berhasil masuk ke Data Penghapusan.');
     }
 
-    // ==============================
-    // FORM SELESAI PERBAIKAN (GET)
-    // ==============================
-    public function selesaiForm($id)
+    public function verifikasiSelesai($id)
     {
-        $data = PerawatanInventaris::with('barang')->findOrFail($id);
-        $title = "Selesaikan Perbaikan";
-        return view('admin.perawatan_inventaris.selesai', compact('data', 'title'));
-    }
-
-    // ==============================
-    // SIMPAN SELESAI PERBAIKAN (POST)
-    // ==============================
-    public function selesaiSubmit(Request $request, $id)
-    {
-        $request->validate([
-            'biaya' => 'required|numeric',
-            'deskripsi' => 'required',
-            'foto_bukti' => 'nullable|image|max:4096'
-        ]);
-
         $p = PerawatanInventaris::findOrFail($id);
 
-        // upload foto bukti
-        if ($request->hasFile('foto_bukti')) {
-            if ($p->foto_bukti) {
-                Storage::disk('public')->delete($p->foto_bukti);
-            }
-            $foto = $request->file('foto_bukti')->store('perawatan/bukti', 'public');
-        } else {
-            $foto = $p->foto_bukti;
-        }
+        $p->update(['status' => 'selesai']);
 
-        $p->update([
-            'biaya' => $request->biaya,
-            'deskripsi' => $request->deskripsi,
-            'foto_bukti' => $foto,
-            'status' => 'selesai'
-        ]);
-
-        return redirect()->route('perawatan_inventaris.index')->with('success', 'Perawatan diselesaikan.');
+        return redirect()->route('perawatan_inventaris.index')->with('success', 'Perbaikan telah diverifikasi dan diselesaikan.');
     }
 }

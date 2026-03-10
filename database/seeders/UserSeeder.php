@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
 			'nomor_hp' => '089234898765',
 			'role' => 'superadmin',
 			'jabatan_id' => 3,
-			'password' => "AdminBMN",
+			'password' => "E5imbaAdmin",
 			'qr_code' => time() . '_qr.png',
 			'foto' => 'default.jpeg',
 			'created_at' => now(),

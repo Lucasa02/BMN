@@ -6,13 +6,13 @@
     {{-- HEADER HALAMAN --}}
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-            <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Laporan Kerusakan</h2>
+            <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Laporan Kondisi Barang</h2>
             <p class="text-sm text-slate-500">Daftar permintaan perbaikan aset yang memerlukan persetujuan.</p>
         </div>
-        
+
         {{-- TOMBOL CETAK PDF UTAMA --}}
-        <a href="{{ route('admin.laporan-kerusakan.export-pdf') }}" 
-        target="_blank" 
+        <a href="{{ route('admin.laporan-kerusakan.export-pdf') }}"
+        target="_blank"
         class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl shadow-md hover:bg-red-700 transition-all duration-200 ease-in-out transform hover:-translate-y-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -24,7 +24,7 @@
     {{-- Jika tidak ada data --}}
     @if ($laporan->isEmpty())
         <div class="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border border-dashed border-gray-300">
-            <p class="text-gray-500">Belum ada laporan kerusakan.</p>
+            <p class="text-gray-500">Belum ada Laporan.</p>
         </div>
     @endif
 
@@ -40,13 +40,13 @@
     @endphp
 
     <div class="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800 dark:border-gray-700 overflow-hidden relative group">
-    
+
     {{-- FOTO BARANG --}}
     <div class="relative overflow-hidden">
         <img class="w-full h-44 object-cover transform transition-transform duration-500 group-hover:scale-110"
              src="{{ $l->barang->foto ? asset('storage/' . $l->barang->foto) : asset('img/no-image.png') }}"
              alt="{{ $l->barang->nama_barang }}">
-        
+
         {{-- STATUS OVERLAY - Gunakan warna yang lebih gelap agar teks putih terbaca --}}
         <div class="absolute top-3 left-3">
             <span class="inline-block bg-slate-900/80 backdrop-blur-md text-white text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-md shadow-sm">

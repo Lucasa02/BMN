@@ -25,6 +25,9 @@
                     fontFamily: {
                         "sans": ["Plus Jakarta Sans", "sans-serif"]
                     },
+                    animation: {
+                        'spin-slow': 'spin 3s linear infinite',
+                    }
                 },
             },
         }
@@ -66,6 +69,14 @@
 
 <div class="max-w-6xl mx-auto px-6 py-10 lg:py-16 space-y-12">
 
+    @php
+        // Logika Pengecekan Status Aset
+        $isRencanaPenghapusan = $barang->perawatan->where('jenis_perawatan', 'rencana_penghapusan')->isNotEmpty();
+        $cek_perawatan = $barang->perawatan->where('jenis_perawatan', '!=', 'rencana_penghapusan')->whereIn('status', ['pending', 'proses'])->count() > 0;
+        $cek_laporan = \App\Models\LaporanKerusakan::where('barang_id', $barang->id)->whereIn('status', ['disetujui', 'proses'])->exists();
+        $sedang_maintenance = $cek_perawatan || $cek_laporan;
+    @endphp
+
     @if (session('success'))
     <div class="animate-reveal p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 text-emerald-700 shadow-sm mb-8">
         <span class="material-symbols-outlined text-emerald-500">verified</span>
@@ -73,11 +84,43 @@
     </div>
     @endif
 
+    {{-- Alert Banner untuk Penghapusan --}}
+    @if($isRencanaPenghapusan)
+        <div class="animate-reveal p-5 bg-red-50 border border-red-200 rounded-[2rem] flex items-center gap-4 text-red-700 shadow-sm mb-2">
+            <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600">
+                <span class="material-symbols-outlined animate-pulse">delete_sweep</span>
+            </div>
+            <div>
+                <p class="font-black uppercase tracking-widest text-sm text-red-800">Status: Rencana Penghapusan</p>
+                <p class="text-xs mt-1 font-medium text-red-600">Aset ini masuk dalam antrean pemutihan/penghapusan negara. Pelaporan fisik ditutup.</p>
+            </div>
+        </div>
+    @elseif($sedang_maintenance)
+    {{-- Alert Banner untuk Maintenance --}}
+        <div class="animate-reveal p-5 bg-amber-50 border border-amber-200 rounded-[2rem] flex items-center gap-4 text-amber-700 shadow-sm mb-2">
+            <div class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600">
+                <span class="material-symbols-outlined animate-spin-slow">engineering</span>
+            </div>
+            <div>
+                <p class="font-black uppercase tracking-widest text-sm text-amber-800">Status: Dalam Pemeliharaan</p>
+                <p class="text-xs mt-1 font-medium text-amber-600">Aset ini sedang dalam penanganan teknisi. Pelaporan Kondisi Barang ditutup sementara.</p>
+            </div>
+        </div>
+    @endif
+
     {{-- Header Navigation --}}
     <nav class="flex justify-between items-center animate-reveal">
         <div class="flex items-center gap-6">
             @php
-                $backUrl = str_contains(url()->previous(), '/rak/') ? url()->previous() : route('user.inventaris');
+                $from = request()->query('from');
+                if ($from === 'teknisi') {
+                    // Pastikan route dasbor teknisi Anda bernama 'user.teknisi.index'
+                    $backUrl = route('user.teknisi.index');
+                } elseif (str_contains(url()->previous(), '/rak/')) {
+                    $backUrl = url()->previous();
+                } else {
+                    $backUrl = route('user.inventaris');
+                }
             @endphp
             <a href="{{ $backUrl }}" class="group flex items-center gap-2 text-slate-400 hover:text-primary transition-all duration-300">
                 <div class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center group-hover:border-primary group-hover:bg-primary/5">
@@ -103,7 +146,7 @@
                 <div class="relative bg-white p-3 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-white">
                     <div class="aspect-square rounded-[2rem] overflow-hidden bg-slate-50 flex items-center justify-center">
                         @if ($barang->foto)
-                            <img src="{{ asset('storage/' . $barang->foto) }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105">
+                            <img src="{{ asset('storage/' . $barang->foto) }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 {{ ($sedang_maintenance || $isRencanaPenghapusan) ? 'grayscale opacity-75' : '' }}">
                         @else
                             <span class="material-symbols-outlined text-8xl text-slate-200">inventory_2</span>
                         @endif
@@ -112,8 +155,16 @@
 
                 {{-- Status Float --}}
                 <div class="absolute -bottom-4 right-8 bg-white px-6 py-3 rounded-2xl shadow-xl border border-slate-50 flex items-center gap-3">
-                    <span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">{{ $barang->kondisi }}</span>
+                    @if($isRencanaPenghapusan)
+                        <span class="flex h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-red-500">PENGHAPUSAN</span>
+                    @elseif($sedang_maintenance)
+                        <span class="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-amber-500">DIPERBAIKI</span>
+                    @else
+                        <span class="flex h-2 w-2 rounded-full {{ in_array($barang->kondisi, ['Baik', 'Sangat Baik']) ? 'bg-emerald-500' : 'bg-rose-500' }} animate-pulse"></span>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">{{ $barang->kondisi }}</span>
+                    @endif
                 </div>
             </div>
 
@@ -237,19 +288,48 @@
 
             {{-- Maintenance & Reporting Action --}}
             <div class="pt-6 animate-reveal delay-3">
-                <a href="{{ route('user.inventaris.lapor-kerusakan.form', $barang->id) }}"
-                    class="flex items-center justify-between p-6 bg-white rounded-3xl border border-rose-100 shadow-sm hover:shadow-xl hover:border-rose-300 transition-all duration-300 group">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all">
-                            <span class="material-symbols-outlined">report_problem</span>
-                        </div>
-                        <div>
-                            <h5 class="text-sm font-black text-slate-800 uppercase tracking-tight">Lapor Kondisi Aset</h5>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase">Laporkan kerusakan atau kendala fisik</p>
+                @if($isRencanaPenghapusan)
+                    <div class="flex items-center justify-between p-6 bg-red-50 rounded-3xl border border-red-100 opacity-70 cursor-not-allowed">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-500">
+                                <span class="material-symbols-outlined">block</span>
+                            </div>
+                            <div>
+                                <h5 class="text-sm font-black text-red-800 uppercase tracking-tight">Pelaporan Ditutup</h5>
+                                <p class="text-[10px] text-red-500 font-bold uppercase">Aset dalam proses penghapusan</p>
+                            </div>
                         </div>
                     </div>
-                    <span class="material-symbols-outlined text-slate-300 group-hover:translate-x-1 transition-transform">chevron_right</span>
-                </a>
+                @elseif($sedang_maintenance)
+                    <div class="flex items-center justify-between p-6 bg-amber-50 rounded-3xl border border-amber-100 opacity-70 cursor-not-allowed">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-500">
+                                <span class="material-symbols-outlined">hourglass_empty</span>
+                            </div>
+                            <div>
+                                <h5 class="text-sm font-black text-amber-800 uppercase tracking-tight">Pelaporan Ditunda</h5>
+                                <p class="text-[10px] text-amber-500 font-bold uppercase">Aset sedang dalam perbaikan teknisi</p>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    {{-- TOMBOL HANYA TAMPIL UNTUK USER -> PETUGAS INVENTARIS --}}
+                    @if(auth()->check() && auth()->user()->role == 'user' && optional(auth()->user()->jabatan)->jabatan == 'Petugas Inventaris')
+                    <a href="{{ route('user.inventaris.lapor-kerusakan.form', $barang->id) }}"
+                        class="flex items-center justify-between p-6 bg-white rounded-3xl border border-rose-100 shadow-sm hover:shadow-xl hover:border-rose-300 transition-all duration-300 group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all">
+                                <span class="material-symbols-outlined">report_problem</span>
+                            </div>
+                            <div>
+                                <h5 class="text-sm font-black text-slate-800 uppercase tracking-tight">Lapor Kondisi Aset</h5>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Laporkan kerusakan atau kendala fisik</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-slate-300 group-hover:translate-x-1 transition-transform">chevron_right</span>
+                    </a>
+                    @endif
+                @endif
             </div>
 
         </div>

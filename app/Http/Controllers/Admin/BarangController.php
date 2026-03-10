@@ -58,22 +58,21 @@ class BarangController extends Controller
     public function bmnIndex(Request $request)
 {
     $search = $request->input('search');
-    // Ambil parameter filter baru
-    $filter_type = $request->input('filter_type'); // ruangan, kategori, atau unit_kerja
+    $filter_type = $request->input('filter_type');
     $filter_value = $request->input('filter_value');
-    $sort = $request->input('sort', 'asc'); // default A-Z
+    $sort = $request->input('sort', 'asc');
 
-    // Ambil semua daftar untuk dropdown
     $list_ruangan = BmnRuangan::orderBy('nama_ruangan', 'asc')->get();
     $list_kategori = BmnKategori::orderBy('nama_kategori', 'asc')->get();
     $list_unit_kerja = UnitKerja::orderBy('nama_unit_kerja', 'asc')->get();
 
-    $bmnQuery = BmnBarang::query()
+    // TAMBAHKAN with(['perawatan']) DI SINI
+    $bmnQuery = BmnBarang::with(['perawatan'])
         ->whereDoesntHave('perawatanInventaris', function ($q) {
             $q->where('jenis_perawatan', 'penghapusan');
         });
 
-    // Logika Filter Berdasarkan Tipe
+    // ... sisa kode filter tetap sama ...
     if ($filter_type && $filter_value) {
         if ($filter_type == 'ruangan') {
             $bmnQuery->where('ruangan', $filter_value);
@@ -84,7 +83,6 @@ class BarangController extends Controller
         }
     }
 
-    // Logika Pencarian Teks
     if ($search) {
         $bmnQuery->where(function($q) use ($search) {
             $q->where('nama_barang', 'like', '%' . $search . '%')
@@ -92,10 +90,9 @@ class BarangController extends Controller
         });
     }
 
-    // Logika Pengurutan (Sorting)
     $bmnQuery->orderBy('nama_barang', $sort);
 
-    $barang = $bmnQuery->paginate(15); // Ubah jumlah per halaman jika perlu
+    $barang = $bmnQuery->paginate(15);
 
     return view('admin.barang.index_bmn', [
         'title'           => 'Data Barang BMN',
@@ -307,15 +304,17 @@ class BarangController extends Controller
 
         $collection = collect();
 
-        // Ambil Data Master jika kategori 'all' atau 'master'
         if ($kategori == 'all' || $kategori == 'master') {
             $master = Barang::with('jenisBarang')->orderBy('nama_barang', 'ASC')->get();
             $collection = $collection->concat($master);
         }
 
-        // Ambil Data BMN jika kategori 'all' atau 'bmn'
         if ($kategori == 'all' || $kategori == 'bmn') {
-            $bmnQuery = BmnBarang::query();
+            // FILTER: Sembunyikan barang yang masuk data penghapusan dari cetak PDF
+            $bmnQuery = BmnBarang::whereDoesntHave('perawatan', function ($q) {
+                $q->where('jenis_perawatan', 'penghapusan');
+            });
+
             if ($ruangan != 'all') {
                 $bmnQuery->where('ruangan', 'like', $ruangan . '%');
             }
@@ -335,8 +334,8 @@ class BarangController extends Controller
                 'title'   => 'Laporan Data Barang BMN'
             ];
             $pdf = Pdf::loadView('admin.bmn.print_filtered', $data)
-            ->setPaper('a4', 'landscape')
-            ->setOptions(['isPhpEnabled' => true]);
+                ->setPaper('a4', 'landscape')
+                ->setOptions(['isPhpEnabled' => true]);
         } else {
             $data = [
                 'barang'      => $collection,
@@ -349,9 +348,6 @@ class BarangController extends Controller
         return $pdf->stream('Laporan-Barang-' . time() . '.pdf');
     }
 
-    /**
-     * Fitur Cetak QR (PDF)
-     */
     public function printQrCode(Request $request)
     {
         ini_set('memory_limit', '-1');
@@ -365,7 +361,11 @@ class BarangController extends Controller
         }
 
         if ($kategori == 'all' || $kategori == 'bmn') {
-            $query = BmnBarang::query();
+            // FILTER: Sembunyikan barang yang masuk data penghapusan dari cetak QR
+            $query = BmnBarang::whereDoesntHave('perawatan', function ($q) {
+                $q->where('jenis_perawatan', 'penghapusan');
+            });
+
             if ($kategori == 'bmn' && $ruangan != 'all') {
                 $query->where('ruangan', 'like', $ruangan . '%');
             }

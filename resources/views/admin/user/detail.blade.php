@@ -8,7 +8,6 @@
     </a>
   </div>
 
-
   {{-- detail content --}}
   <div class="p-3 ml-6 mr-3 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <ul
@@ -30,7 +29,6 @@
           class="inline-block p-4 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300">QR-Code</button>
       </li>
     </ul>
-
 
     <div id="defaultTabContent">
       <div class="hidden p-4 bg-white rounded-lg md:p-8 dark:bg-gray-800" id="detail" role="tabpanel"
@@ -62,24 +60,32 @@
             <i class="fa-solid fa-user-shield"></i>
             <span class="leading-tight font-bold">Role / Hak Akses : </span>
             <span
-              class="{{ $user->role == 'superadmin' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ($user->role == 'admin' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300') }} text-sm font-medium me-2 px-2.5 py-0.5 rounded">
-              {{ $user->role == 'superadmin' ? 'Superadmin' : ($user->role == 'admin' ? 'Admin' : 'User') }}
+              class="
+                @if($user->role == 'superadmin') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300
+                @elseif($user->role == 'admin') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
+                @elseif($user->role == 'teknisi') bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300
+                @else bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300
+                @endif
+                text-sm font-medium me-2 px-2.5 py-0.5 rounded">
+
+              {{
+                $user->role == 'superadmin' ? 'Superadmin' :
+                ($user->role == 'admin' ? 'Admin' :
+                ($user->role == 'teknisi' ? 'Teknisi' : 'User'))
+              }}
             </span>
           </li>
-
         </ul>
       </div>
-
 
       <div class="hidden p-4 bg-white rounded-lg md:p-8 dark:bg-gray-800" id="gambar" role="tabpanel"
         aria-labelledby="gambar-tab">
         <figure class="flex flex-col items-center justify-center max-w-lg mx-auto">
           <img class="h-auto w-64 rounded-lg shadow-md"
-            src=" {{ $user->foto ? asset('storage/uploads/foto_user/' . $user->foto) : Avatar::create($user->nama_lengkap)->toBase64() }}"
+            src=" {{ $user->foto && $user->foto !== 'default.jpeg' ? asset('storage/uploads/foto_user/' . $user->foto) : Avatar::create($user->nama_lengkap)->toBase64() }}"
             alt="{{ $user->nama_lengkap }}">
         </figure>
       </div>
-
 
       <div class="hidden p-4 bg-white rounded-lg md:p-8 dark:bg-gray-800" id="qrcode" role="tabpanel"
         aria-labelledby="qrcode-tab">
@@ -88,7 +94,6 @@
             src="{{ asset('storage/uploads/qr_codes_user/' . $user->qr_code) }}" alt="image description">
         </figure>
       </div>
-
     </div>
   </div>
 @endsection

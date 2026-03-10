@@ -1,9 +1,13 @@
 @php
-    // 1. Ambil parameter 'from' dari URL (contoh: profil?from=inventaris)
     $from = request('from');
 
-    // 2. Tentukan link kembali berdasarkan asal halaman
-    $backRoute = ($from === 'inventaris') ? route('user.inventaris') : route('user.option');
+    if ($from === 'inventaris') {
+        $backRoute = route('user.inventaris');
+    } elseif ($from === 'teknisi') {
+        $backRoute = route('user.teknisi.index');
+    } else {
+        $backRoute = route('user.option');
+    }
 @endphp
 <!DOCTYPE html>
 <html lang="en">

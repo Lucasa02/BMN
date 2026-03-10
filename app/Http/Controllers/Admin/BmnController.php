@@ -315,28 +315,24 @@ class BmnController extends Controller
     public function index(Request $request, $ruangan)
     {
         $keyword = $request->input('q') ?? $request->input('search');
-
-        // Ambil data ruangan untuk dropdown di modal cetak
         $list_ruangan = BmnRuangan::orderBy('nama_ruangan', 'asc')->get();
 
         $data = BmnBarang::with([
             'perawatan' => function ($q) {
-                $q->whereIn('status', ['pending', 'proses'])
-                    ->orderBy('tanggal_perawatan', 'desc');
-            },
-            'perawatanAktif'
+                $q->orderBy('tanggal_perawatan', 'desc');
+            }
         ])
+            // Sembunyikan barang di data penghapusan
+            ->whereDoesntHave('perawatan', function ($q) {
+                $q->where('jenis_perawatan', 'penghapusan');
+            })
             ->where('ruangan', 'LIKE', ucfirst($ruangan) . '%')
             ->when($keyword, function ($query) use ($keyword) {
                 $query->where(function ($q) use ($keyword) {
                     $q->where('nama_barang', 'like', "%{$keyword}%")
                         ->orWhere('kode_barang', 'like', "%{$keyword}%")
                         ->orWhere('nup', 'like', "%{$keyword}%")
-                        ->orWhere('kategori', 'like', "%{$keyword}%")
-                        ->orWhere('merk', 'like', "%{$keyword}%")
-                        ->orWhere('asal_pengadaan', 'like', "%{$keyword}%")
-                        ->orWhere('peruntukan', 'like', "%{$keyword}%")
-                        ->orWhere('kondisi', 'like', "%{$keyword}%");
+                        ->orWhere('kategori', 'like', "%{$keyword}%");
                 });
             })
             ->orderBy('nama_barang')
@@ -344,7 +340,6 @@ class BmnController extends Controller
 
         $title = 'Data BMN - ' . ucfirst($ruangan);
 
-        // Tambahkan 'list_ruangan' ke compact
         return view('admin.bmn.index', compact('data', 'ruangan', 'title', 'keyword', 'list_ruangan'));
     }
 
@@ -445,21 +440,31 @@ class BmnController extends Controller
     }
 
     public function show($ruangan, $id)
-    {
-    // Eager load perawatan yang statusnya pending atau proses
-    $barang = BmnBarang::with(['perawatan' => function($q){
-    $q->whereIn('status', ['proses', 'pending'])->orderBy('tanggal_perawatan', 'desc');
-    }])->findOrFail($id);
-
+{
+    // Load semua perawatan terkait untuk pengecekan status
+    $barang = BmnBarang::with('perawatan')->findOrFail($id);
 
     $title = 'Detail Barang - ' . ucfirst($ruangan);
 
+    // Cek apakah ada rencana penghapusan
+    $isRencanaPenghapusan = $barang->perawatan
+        ->where('jenis_perawatan', 'rencana_penghapusan')
+        ->isNotEmpty();
 
-    // Ambil perawatan aktif (jika ada) — gunakan koleksi dari relasi yang sudah eager-loaded
-    $perawatan = $barang->perawatan->first(); // null jika tidak ada
+    // Cek maintenance (perbaikan biasa)
+    $cek_perawatan = $barang->perawatan()
+        ->whereIn('status', ['pending', 'proses'])
+        ->where('jenis_perawatan', '!=', 'rencana_penghapusan')
+        ->exists();
 
-    return view('admin.bmn.show', compact('barang', 'ruangan', 'title','perawatan'));
-    }
+    $cek_laporan = \App\Models\LaporanKerusakan::where('barang_id', $id)
+        ->whereIn('status', ['disetujui', 'proses'])
+        ->exists();
+
+    $sedang_maintenance = $cek_perawatan || $cek_laporan;
+
+    return view('admin.bmn.show', compact('barang', 'ruangan', 'title', 'sedang_maintenance', 'isRencanaPenghapusan'));
+}
 
     public function edit($ruangan, $id)
     {
@@ -585,6 +590,10 @@ class BmnController extends Controller
     public function print($ruangan)
     {
         $data = BmnBarang::where('ruangan', 'like', ucfirst($ruangan) . '%')
+            // Sembunyikan barang di data penghapusan
+            ->whereDoesntHave('perawatan', function ($q) {
+                $q->where('jenis_perawatan', 'penghapusan');
+            })
             ->orderBy('nama_barang')
             ->get();
 
@@ -597,16 +606,15 @@ class BmnController extends Controller
         $keyword = $request->input('search');
 
         $data = BmnBarang::where('ruangan', ucfirst($ruangan))
+            // Sembunyikan barang di data penghapusan
+            ->whereDoesntHave('perawatan', function ($q) {
+                $q->where('jenis_perawatan', 'penghapusan');
+            })
             ->when($keyword, function ($query) use ($keyword) {
                 $query->where(function ($q) use ($keyword) {
                     $q->where('nama_barang', 'like', "%{$keyword}%")
                         ->orWhere('kode_barang', 'like', "%{$keyword}%")
-                        ->orWhere('kategori', 'like', "%{$keyword}%")
-                        ->orWhere('merk', 'like', "%{$keyword}%")
-                        ->orWhere('nomor_seri', 'like', "%{$keyword}%")
-                        ->orWhere('asal_pengadaan', 'like', "%{$keyword}%")
-                        ->orWhere('peruntukan', 'like', "%{$keyword}%")
-                        ->orWhere('kondisi', 'like', "%{$keyword}%");
+                        ->orWhere('kategori', 'like', "%{$keyword}%");
                 });
             })
             ->orderBy('nama_barang', 'asc')
@@ -630,16 +638,16 @@ class BmnController extends Controller
 
     public function printFiltered(Request $request, $ruangan)
     {
-        $query = BmnBarang::where('ruangan', ucfirst($ruangan));
+        $query = BmnBarang::where('ruangan', ucfirst($ruangan))
+            // Sembunyikan barang di data penghapusan
+            ->whereDoesntHave('perawatan', function ($q) {
+                $q->where('jenis_perawatan', 'penghapusan');
+            });
 
         if ($request->filled('tahun_pengadaan')) $query->where('tahun_pengadaan', $request->tahun_pengadaan);
         if ($request->filled('kondisi')) $query->where('kondisi', $request->kondisi);
         if ($request->filled('kategori')) $query->where('kategori', $request->kategori);
         if ($request->filled('asal_pengadaan')) $query->where('asal_pengadaan', $request->asal_pengadaan);
-        if ($request->filled('posisi')) $query->where('posisi', $request->posisi);
-        if ($request->filled('peruntukan')) $query->where('peruntukan', $request->peruntukan);
-        if ($request->filled('merk')) $query->where('merk', $request->merk);
-        if ($request->filled('nomor_seri')) $query->where('nomor_seri', $request->nomor_seri);
 
         $data = $query->orderBy('nama_barang', 'asc')->get();
         $title = 'Laporan BMN (Filtered) - ' . ucfirst($ruangan);
@@ -652,20 +660,20 @@ class BmnController extends Controller
     }
 
     /** 🔥 Download QR ALL Barang */
-public function downloadQRAll()
-{
-    $url = route('user.inventaris.index');
+    public function downloadQRAll()
+    {
+        $url = route('user.inventaris.index');
 
-    // Buat QR PNG
-    $qr = QrCode::format('png')
-        ->size(400)
-        ->errorCorrection('H')
-        ->generate($url);
+        // Buat QR PNG
+        $qr = QrCode::format('png')
+            ->size(400)
+            ->errorCorrection('H')
+            ->generate($url);
 
-    $filename = 'QR-ALL-INVENTARIS.png';
+        $filename = 'QR-ALL-INVENTARIS.png';
 
-    return response($qr)
-        ->header('Content-Type', 'image/png')
-        ->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
-}
+        return response($qr)
+            ->header('Content-Type', 'image/png')
+            ->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
+    }
 }

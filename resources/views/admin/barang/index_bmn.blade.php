@@ -238,24 +238,56 @@
                         $detailRoute = route('bmn.show', [strtolower($b->ruangan), $b->id]);
                         $fotoPath = $b->foto ? asset('storage/' . $b->foto) : asset('img/no-image.png');
                         $isRuangan = in_array($b->ruangan, $ruanganNames);
+
+                        // 1. Cek Rencana Penghapusan (Prioritas Utama)
+                        $isRencanaPenghapusan = $b->perawatan->where('jenis_perawatan', 'rencana_penghapusan')->isNotEmpty();
+
+                        // 2. Cek Maintenance Biasa (Tidak termasuk rencana penghapusan)
+                        $cek_perawatan = $b->perawatan
+                            ->where('jenis_perawatan', '!=', 'rencana_penghapusan')
+                            ->whereIn('status', ['pending', 'proses'])
+                            ->count() > 0;
+
+                        $cek_laporan = \App\Models\LaporanKerusakan::where('barang_id', $b->id)
+                            ->whereIn('status', ['disetujui', 'proses'])
+                            ->exists();
+
+                        $sedang_maintenance = $cek_perawatan || $cek_laporan;
+
+                        // Tentukan class border
+                        $borderClass = 'border-gray-100';
+                        if ($isRencanaPenghapusan) {
+                            $borderClass = 'border-red-300 ring-4 ring-red-50';
+                        } elseif ($sedang_maintenance) {
+                            $borderClass = 'border-amber-300 ring-4 ring-amber-50';
+                        }
                     @endphp
 
-                    <div class="animate-card group bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover-lift overflow-hidden flex flex-col"
+                    <div class="animate-card group bg-white rounded-[2.5rem] border {{ $borderClass }} shadow-sm hover-lift overflow-hidden flex flex-col relative"
                         style="animation-delay: {{ $index * 0.05 }}s">
 
                         <div class="relative h-52 bg-slate-50 overflow-hidden">
-                            <div class="absolute top-4 left-4 z-10">
-                                <span
-                                    class="bg-white/90 backdrop-blur text-[#1b365d] text-[9px] font-black px-3 py-1.5 rounded-full shadow-sm uppercase tracking-[0.1em]">
+                            <div class="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                                <span class="bg-white/90 backdrop-blur text-[#1b365d] text-[9px] font-black px-3 py-1.5 rounded-full shadow-sm uppercase tracking-[0.1em] w-fit">
                                     {{ $b->kategori }}
                                 </span>
+
+                                {{-- LABEL STATUS KHUSUS --}}
+                                @if($isRencanaPenghapusan)
+                                    <span class="bg-red-100/90 backdrop-blur text-red-700 border border-red-200 text-[9px] font-black px-3 py-1.5 rounded-full shadow-sm uppercase tracking-[0.1em] flex items-center gap-1.5 w-fit">
+                                        <i class="fa-solid fa-trash-can animate-pulse"></i> Rencana Penghapusan
+                                    </span>
+                                @elseif($sedang_maintenance)
+                                    <span class="bg-amber-100/90 backdrop-blur text-amber-700 border border-amber-200 text-[9px] font-black px-3 py-1.5 rounded-full shadow-sm uppercase tracking-[0.1em] flex items-center gap-1.5 w-fit">
+                                        <i class="fa-solid fa-gear fa-spin" style="--fa-animation-duration: 3s;"></i> Maintenance
+                                    </span>
+                                @endif
                             </div>
 
                             <img src="{{ $fotoPath }}" alt="{{ $b->nama_barang }}"
-                                class="w-full h-full object-contain p-8 group-hover:scale-110 transition-transform duration-700 ease-out">
+                                class="w-full h-full object-contain p-8 group-hover:scale-110 transition-transform duration-700 ease-out {{ ($sedang_maintenance || $isRencanaPenghapusan) ? 'grayscale opacity-80' : '' }}">
 
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-[#1b365d]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#1b365d]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             </div>
                         </div>
 
@@ -269,9 +301,19 @@
                                 {{-- KONDISI BADGE --}}
                                 <div class="flex justify-between items-center bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
                                     <span class="text-[9px] uppercase tracking-widest text-slate-400 font-black">Kondisi</span>
-                                    <span class="text-[10px] font-black px-2 py-0.5 rounded-lg {{ in_array($b->kondisi, ['Baik', 'Sangat Baik']) ? 'text-emerald-700 bg-emerald-100/50' : 'text-rose-700 bg-rose-100/50' }}">
-                                        {{ strtoupper($b->kondisi) }}
-                                    </span>
+                                    @if($isRencanaPenghapusan)
+                                        <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-red-700 bg-red-100/50">
+                                            PENGHAPUSAN
+                                        </span>
+                                    @elseif($sedang_maintenance)
+                                        <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-amber-700 bg-amber-100/50">
+                                            DIPERBAIKI
+                                        </span>
+                                    @else
+                                        <span class="text-[10px] font-black px-2 py-0.5 rounded-lg {{ in_array($b->kondisi, ['Baik', 'Sangat Baik']) ? 'text-emerald-700 bg-emerald-100/50' : 'text-rose-700 bg-rose-100/50' }}">
+                                            {{ strtoupper($b->kondisi) }}
+                                        </span>
+                                    @endif
                                 </div>
 
                                 <div class="flex flex-col gap-2.5 px-1">

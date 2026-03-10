@@ -16,6 +16,9 @@ return new class extends Migration
             $table->unsignedBigInteger('barang_id');
             $table->foreign('barang_id')->references('id')->on('bmn_barangs')->onDelete('cascade');
 
+            // TAMBAHAN BARU: Menyimpan ID Teknisi/User yang memperbaiki
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+
             $table->date('tanggal_perawatan')->nullable();
 
             $table->enum('jenis_perawatan', [

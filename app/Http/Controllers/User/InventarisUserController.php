@@ -13,62 +13,64 @@ use App\Models\PerawatanInventaris;
 
 class InventarisUserController extends Controller
 {
-    /**
-     * Halaman daftar inventaris (index)
-     */
     public function index()
     {
         $title = "Inventaris Barang";
-        $barang = BmnBarang::with('perawatan')->latest()->paginate(10);
+        // Filter agar barang yang sudah di 'penghapusan' tidak tampil
+        $barang = BmnBarang::with('perawatan')
+            ->whereDoesntHave('perawatan', function ($q) {
+                $q->where('jenis_perawatan', 'penghapusan');
+            })->latest()->paginate(10);
 
-        // Pastikan view index ada (resources/views/user/inventaris/index.blade.php)
         return view('user.inventaris', compact('title', 'barang'));
     }
 
-    /**
-     * Halaman show all (dipanggil setelah scan ALL)
-     */
     public function showAll()
     {
         $title = "Semua Inventaris (Scan ALL)";
-        // Jika ingin pagination gunakan paginate(), atau all() untuk semua
-        $barang = BmnBarang::with('perawatan')->latest()->paginate(12);
-        $ruangan = request('ruangan') ?? 'default';                 
+        $barang = BmnBarang::with('perawatan')
+            ->whereDoesntHave('perawatan', function ($q) {
+                $q->where('jenis_perawatan', 'penghapusan');
+            })->latest()->paginate(12);
+        $ruangan = request('ruangan') ?? 'default';
         return view('user.inventaris.show_all', compact('title', 'barang','ruangan'));
     }
 
-    /**
-     * Scan QR → jika kode = ALL => showAll, jika kode barang => detail
-     */
-    public function scan($kode)
+    public function scan(Request $request, $kode) // <-- Tambahkan Request $request
     {
-        // bersihkan kode yang mungkin berisi spasi/newline
         $kode = trim($kode);
+        $from = $request->query('from'); // <-- Tangkap parameter asal
 
         if (strtoupper($kode) === 'ALL') {
-            // redirect ke route show_all yang sudah mengembalikan view — TIDAK ada loop
             return redirect()->route('user.inventaris.show_all')
                 ->with('success', 'Menampilkan semua barang.');
         }
 
-        // cari barang berdasarkan kode
-        $barang = BmnBarang::where('kode_barang', $kode)->first();
+        // Pastikan QR yang di scan bukan barang yang sudah di 'penghapusan'
+        $barang = BmnBarang::whereDoesntHave('perawatan', function ($q) {
+                $q->where('jenis_perawatan', 'penghapusan');
+            })->where('kode_barang', $kode)->first();
 
         if ($barang) {
-            return redirect()->route('user.inventaris.detail', $barang->id);
+            // <-- Teruskan parameter 'from' ke halaman detail
+            return redirect()->route('user.inventaris.detail', [
+                'id' => $barang->id,
+                'from' => $from
+            ]);
         }
 
-        // jika tidak ketemu, arahkan juga ke show_all dengan peringatan
         return redirect()->route('user.inventaris.show_all')
-            ->with('warning', 'QR tidak dikenali. Menampilkan semua barang.');
+            ->with('warning', 'QR tidak dikenali atau barang sudah dihapus. Menampilkan semua barang.');
     }
 
-    /**
-     * Detail barang
-     */
     public function detail($id)
     {
-        $barang = BmnBarang::findOrFail($id);
+        // Pastikan load perawatan dan pastikan bukan barang terhapus
+        $barang = BmnBarang::with('perawatan')
+            ->whereDoesntHave('perawatan', function ($q) {
+                $q->where('jenis_perawatan', 'penghapusan');
+            })->findOrFail($id);
+
         $title = "Detail Barang";
 
         return view('user.inventaris.detail', compact('title', 'barang'));
@@ -86,7 +88,7 @@ class InventarisUserController extends Controller
             ->size(600)
             ->margin(1)
             ->generate($url);
-            
+
         try {
             $qr = new Imagick();
             $qr->readImageBlob($qrData);
@@ -154,10 +156,13 @@ class InventarisUserController extends Controller
 
     public function scanRak($nama_rak)
     {
-        $nama_rak = urldecode($nama_rak); // Mengubah %20 kembali jadi spasi
+        $nama_rak = urldecode($nama_rak);
 
-        // Cari semua barang yang memiliki lokasi di rak tersebut
-        $barang = \App\Models\BmnBarang::where('ruangan', $nama_rak)->get();
+        // Cari barang, load perawatan, dan kecualikan yang sudah di 'penghapusan'
+        $barang = \App\Models\BmnBarang::with('perawatan')
+            ->whereDoesntHave('perawatan', function ($q) {
+                $q->where('jenis_perawatan', 'penghapusan');
+            })->where('ruangan', $nama_rak)->get();
 
         return view('user.inventaris.hasil_scan_rak', [
             'barang' => $barang,

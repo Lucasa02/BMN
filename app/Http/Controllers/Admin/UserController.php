@@ -26,7 +26,7 @@ class UserController extends Controller
 		$query = User::query();
 
 		if ($currentUser->role !== 'superadmin') {
-			$query->whereIn('role', ['admin', 'user']);
+			$query->whereIn('role', ['admin', 'user', 'teknisi']);
 		}
 
 		$data = [
@@ -56,65 +56,72 @@ class UserController extends Controller
 	 * Store a newly created resource in storage.
 	 */
 	public function store(Request $request)
-	{
+  {
+    $request->validate(
+      [
+        'nama_lengkap' => 'required',
+        'email' => 'required|email|unique:users,email',
+        'nomor_hp' => 'required|numeric',
+        'role' => 'required',
+        'nip' => 'required|numeric|unique:users,nip',
+        'foto' => 'nullable|file|mimes:jpg,jpeg,png',
+      ],
+      [
+        'nama_lengkap.required' => 'Nama Lengkap wajib diisi.',
+        'email.required' => 'Email wajib diisi.',
+        'email.email' => 'Email tidak valid.',
+        'email.unique' => 'Email sudah terdaftar.',
+        'nomor_hp.required' => 'Nomor HP wajib diisi.',
+        'nomor_hp.numeric' => 'Nomor HP harus berupa angka.',
+        'role.required' => 'Role wajib diisi.',
+        'nip.required' => 'NIP wajib diisi.',
+        'nip.numeric' => 'NIP harus berupa angka.',
+        'nip.unique' => 'NIP sudah terdaftar.',
+        'foto.mimes' => 'File harus dalam format jpg, jpeg, png.',
+      ]
+    );
 
-		$request->validate(
-			[
-				'nama_lengkap' => 'required',
-				'email' => 'required|email|unique:users,email',
-				'nomor_hp' => 'required|numeric',
-				'role' => 'required',
-				'nip' => 'required|numeric|unique:users,nip',
-				'foto' => 'nullable|file|mimes:jpg,jpeg,png',
-			],
-			[
-				'nama_lengkap.required' => 'Nama Lengkap wajib diisi.',
-				'email.required' => 'Email wajib diisi.',
-				'email.email' => 'Email tidak valid.',
-				'email.unique' => 'Email sudah terdaftar.',
-				'nomor_hp.required' => 'Nomor HP wajib diisi.',
-				'nomor_hp.numeric' => 'Nomor HP harus berupa angka.',
-				'role.required' => 'Role wajib diisi.',
-				'nip.required' => 'NIP wajib diisi.',
-				'nip.numeric' => 'NIP harus berupa angka.',
-				'nip.unique' => 'NIP sudah terdaftar.',
-				'foto.mimes' => 'File harus dalam format jpg, jpeg, png.',
-			]
-		);
+    // LOGIKA PENENTUAN JABATAN OTOMATIS BERDASARKAN ROLE
+    if ($request->role === 'teknisi') {
+        $jabatanUser = Jabatan::where('jabatan', 'Petugas Teknisi')->first();
+        $namaJabatanError = 'Petugas Teknisi';
+    } else {
+        $jabatanUser = Jabatan::where('jabatan', 'Petugas Inventaris')->first();
+        $namaJabatanError = 'Petugas Inventaris';
+    }
 
-		$jabatanPetugas = Jabatan::where('jabatan', 'Petugas Inventaris')->first();
+    // Pengecekan apakah jabatan ada di database
+    if (!$jabatanUser) {
+      notify()->error("Jabatan {$namaJabatanError} tidak ditemukan di database.");
+      return redirect()->back();
+    }
 
-		if (!$jabatanPetugas) {
-			notify()->error('Jabatan Petugas Inventaris tidak ditemukan di database.');
-			return redirect()->back();
-		}
+    $kode_user = 'USR' . random_int(1, 999999);
+    $qrCode = QrCode::format('png')->size(200)->generate($kode_user);
+    $qrCodeFilename = time() . '_qr.png';
+    Storage::disk('public')->put('uploads/qr_codes_user/' . $qrCodeFilename, $qrCode);
 
-		$kode_user = 'USR' . random_int(1, 999999);
-		$qrCode = QrCode::format('png')->size(200)->generate($kode_user);
-		$qrCodeFilename = time() . '_qr.png';
-		Storage::disk('public')->put('uploads/qr_codes_user/' . $qrCodeFilename, $qrCode);
+    $password = in_array($request->role, ['admin', 'superadmin'])
+      ? Hash::make($request->password)
+      : null;
 
-		$password = in_array($request->role, ['admin', 'superadmin'])
-			? Hash::make($request->password)
-			: null;
+    User::create([
+      'uuid' => Str::uuid(),
+      'kode_user' => $kode_user,
+      'nama_lengkap' => $request->nama_lengkap,
+      'email' => $request->email,
+      'password' => $password,
+      'jabatan_id' => $jabatanUser->id, // Menggunakan ID jabatan yang sudah ditentukan di atas
+      'nomor_hp' => $request->nomor_hp,
+      'nip' => $request->nip,
+      'role' => $request->role,
+      'qr_code' => $qrCodeFilename,
+      'foto' => NULL,
+    ]);
 
-		User::create([
-			'uuid' => Str::uuid(),
-			'kode_user' => $kode_user,
-			'nama_lengkap' => $request->nama_lengkap,
-			'email' => $request->email,
-			'password' => $password,
-			'jabatan_id' => $jabatanPetugas->id,
-			'nomor_hp' => $request->nomor_hp,
-			'nip' => $request->nip,
-			'role' => $request->role,
-			'qr_code' => $qrCodeFilename,
-			'foto' => NULL,
-		]);
-
-		notify()->success('User Berhasil Ditambahkan');
-		return redirect()->route('users.index');
-	}
+    notify()->success('User Berhasil Ditambahkan');
+    return redirect()->route('users.index');
+  }
 
 	/**
 	 * Display the specified resource.
@@ -286,11 +293,11 @@ class UserController extends Controller
         notify()->error('User tidak ditemukan !');
         return redirect()->back();
     }
-    
+
     // Gunakan 'landscape' agar dua kartu muat bersisian dengan aman
     $pdf = Pdf::loadView('admin.user.id-card', ['user' => $user])
-              ->setPaper('a4', 'landscape'); 
-              
+              ->setPaper('a4', 'landscape');
+
     return $pdf->stream('ID-Card-' . $user->nama_lengkap . '.pdf');
 }
 

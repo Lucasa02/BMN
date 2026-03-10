@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-
 class PerawatanInventaris extends Model
 {
     use HasFactory;
@@ -16,6 +15,7 @@ class PerawatanInventaris extends Model
     protected $fillable = [
         'uuid',
         'barang_id',
+        'user_id', // <-- WAJIB ditambahkan agar bisa menyimpan ID teknisi
         'tanggal_perawatan',
         'jenis_perawatan',
         'deskripsi',
@@ -24,7 +24,6 @@ class PerawatanInventaris extends Model
         'foto_kerusakan',
         'foto_bukti',
         'surat_penghapusan'
-        
     ];
 
     // Tambahkan ini agar UUID terisi otomatis
@@ -32,7 +31,7 @@ class PerawatanInventaris extends Model
     {
         parent::boot();
         static::creating(function ($model) {
-            $model->uuid = Str::uuid();
+            $model->uuid = (string) Str::uuid(); // Gunakan (string) agar pasti bertipe string
         });
     }
 
@@ -41,5 +40,9 @@ class PerawatanInventaris extends Model
         return $this->belongsTo(BmnBarang::class, 'barang_id');
     }
 
-    
+    // RELASI BARU: Menghubungkan perawatan dengan Teknisi (User)
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

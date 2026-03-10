@@ -96,13 +96,18 @@
 <div class="max-w-7xl mx-auto px-6 py-12">
 
     <header class="mb-16 animate__animated animate__fadeIn">
+        @php
+            $from = request()->query('from');
+            $backUrl = ($from === 'teknisi') ? route('user.teknisi.index') : route('user.inventaris');
+        @endphp
+
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
             <div class="space-y-6">
-                <a href="{{ route('user.inventaris') }}" class="group inline-flex items-center gap-3 text-primary font-bold text-sm tracking-wide">
+                <a href="{{ $backUrl }}" class="group inline-flex items-center gap-3 text-primary font-bold text-sm tracking-wide">
                     <div class="w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
                         <span class="material-symbols-outlined text-lg">arrow_back</span>
                     </div>
-                    <span>Kembali Ke Pemindaian</span>
+                    <span>{{ $from === 'teknisi' ? 'Kembali Ke Dasbor Teknisi' : 'Kembali Ke Pemindaian' }}</span>
                 </a>
 
                 <div class="space-y-2">
@@ -157,32 +162,52 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
         @foreach($barang as $index => $b)
+        @php
+            // Logika cek status (Sama seperti admin)
+            $isRencanaPenghapusan = $b->perawatan->where('jenis_perawatan', 'rencana_penghapusan')->isNotEmpty();
+            $cek_perawatan = $b->perawatan->where('jenis_perawatan', '!=', 'rencana_penghapusan')->whereIn('status', ['pending', 'proses'])->count() > 0;
+            $cek_laporan = \App\Models\LaporanKerusakan::where('barang_id', $b->id)->whereIn('status', ['disetujui', 'proses'])->exists();
+            $sedang_maintenance = $cek_perawatan || $cek_laporan;
+        @endphp
+
         <div class="animate__animated animate__fadeInUp card-luxury rounded-[2.5rem] overflow-hidden flex flex-col group/card hover-zoom"
              style="animation-delay: {{ $index * 0.1 }}s">
 
             <div class="relative aspect-square overflow-hidden bg-slate-100">
                 @if ($b->foto)
-                    <img src="{{ asset('storage/' . $b->foto) }}" class="object-cover w-full h-full transition-all duration-1000" alt="{{ $b->nama_barang }}">
+                    {{-- Tambahkan filter grayscale jika maintenance/penghapusan --}}
+                    <img src="{{ asset('storage/' . $b->foto) }}" class="object-cover w-full h-full transition-all duration-1000 {{ ($sedang_maintenance || $isRencanaPenghapusan) ? 'grayscale opacity-75' : '' }}" alt="{{ $b->nama_barang }}">
                 @else
                     <div class="flex flex-col items-center justify-center h-full text-slate-300">
                         <span class="material-symbols-outlined text-7xl font-light">image_not_supported</span>
                     </div>
                 @endif
 
-                <div class="absolute top-6 left-6">
-                    <div class="px-4 py-2 rounded-full bg-primary/90 backdrop-blur-md border border-white/20 shadow-2xl">
+                <div class="absolute top-6 left-6 flex flex-col gap-2">
+                    <div class="px-4 py-2 rounded-full bg-primary/90 backdrop-blur-md border border-white/20 shadow-2xl w-fit">
                         <p class="text-[9px] font-black text-gold uppercase tracking-[0.2em] leading-none">{{ $b->kode_barang }}</p>
                     </div>
                 </div>
 
                 <div class="absolute bottom-6 right-6">
-                    <span class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[11px] font-bold uppercase tracking-wider bg-white/95 text-slate-800 shadow-xl border border-white">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full {{ $b->kondisi == 'Baik' ? 'bg-emerald-400' : 'bg-rose-400' }} opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 {{ $b->kondisi == 'Baik' ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
+                    {{-- Ubah badge kondisi jika maintenance / penghapusan --}}
+                    @if($isRencanaPenghapusan)
+                        <span class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[11px] font-bold uppercase tracking-wider bg-red-100 text-red-700 shadow-xl border border-red-200">
+                            <span class="material-symbols-outlined text-sm animate-pulse">delete_sweep</span> Penghapusan
                         </span>
-                        {{ $b->kondisi }}
-                    </span>
+                    @elseif($sedang_maintenance)
+                        <span class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[11px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 shadow-xl border border-amber-200">
+                            <span class="material-symbols-outlined text-sm animate-spin-slow">engineering</span> Diperbaiki
+                        </span>
+                    @else
+                        <span class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[11px] font-bold uppercase tracking-wider bg-white/95 text-slate-800 shadow-xl border border-white">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full {{ in_array($b->kondisi, ['Baik', 'Sangat Baik']) ? 'bg-emerald-400' : 'bg-rose-400' }} opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 {{ in_array($b->kondisi, ['Baik', 'Sangat Baik']) ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
+                            </span>
+                            {{ $b->kondisi }}
+                        </span>
+                    @endif
                 </div>
             </div>
 
@@ -241,8 +266,8 @@
             Tidak ditemukan aset negara yang terdaftar pada koordinat <span class="font-bold text-gold">{{ $nama_rak }}</span> saat ini.
         </p>
 
-        <a href="{{ route('user.inventaris') }}" class="mt-10 px-8 py-4 bg-primary text-white rounded-2xl font-bold shadow-xl hover:shadow-primary/30 transition-all active:scale-95">
-            Coba Scan Ulang
+        <a href="{{ $backUrl }}" class="mt-10 px-8 py-4 bg-primary text-white rounded-2xl font-bold shadow-xl hover:shadow-primary/30 transition-all active:scale-95">
+            {{ $from === 'teknisi' ? 'Kembali ke Dasbor' : 'Coba Scan Ulang' }}
         </a>
     </div>
     @endif
