@@ -235,7 +235,7 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('user.inventaris.scan', $b->kode_barang) }}"
+                    <a href="{{ route('user.inventaris.scan', [$b->kode_barang, 'from' => $from]) }}"
                        class="group/btn relative flex items-center justify-center w-full py-5 navy-gradient text-white rounded-2xl text-sm font-bold transition-all duration-300 overflow-hidden shadow-lg shadow-primary/20">
                         <span class="relative z-10 flex items-center gap-2">
                             Lihat Detail Aset

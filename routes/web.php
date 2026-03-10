@@ -331,6 +331,9 @@ Route::prefix('user')->group(function () {
 
   Route::middleware(['auth', 'role:user', 'jabatan:Petugas Inventaris'])->group(function () {
     Route::get('/inventaris/qr/download', [InventarisUserController::class, 'downloadAllQR'])->name('user.inventaris.qr.download');
+  });
+
+  Route::middleware(['auth', 'role:user,teknisi'])->group(function () {
     Route::get('/inventaris/{id}/lapor-kerusakan', [LaporanKerusakanController::class, 'form'])->name('user.inventaris.lapor-kerusakan.form');
     Route::post('/inventaris/lapor-kerusakan/store', [LaporanKerusakanController::class, 'store'])->name('user.inventaris.lapor-kerusakan.store');
   });

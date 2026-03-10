@@ -43,7 +43,10 @@ class LaporanKerusakanController extends Controller
             'status' => 'pending',
         ]);
 
-        return redirect()->route('user.inventaris.detail', $request->barang_id)
+        return redirect()->route('user.inventaris.detail', [
+                'id' => $request->barang_id,
+                'from' => $request->from // Mengembalikan parameter from ke URL
+            ])
             ->with('success', 'Laporan telah dikirim, menunggu verifikasi admin.');
     }
 }

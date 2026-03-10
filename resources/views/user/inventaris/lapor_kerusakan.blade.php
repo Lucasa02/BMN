@@ -78,11 +78,11 @@
                 <div class="flex items-start justify-between gap-4">
                     <div class="flex items-center gap-4">
                         {{-- TOMBOL BACK BARU --}}
-                        <a href="{{ url()->previous() }}" 
+                        <a href="{{ url()->previous() }}"
                         class="flex items-center justify-center min-w-[40px] h-10 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:text-primary-600 transition-all shadow-sm">
                             <span class="material-symbols-outlined">arrow_back</span>
                         </a>
-                        
+
                         <div>
                             <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
                                 Lapor Kondisi Barang
@@ -92,7 +92,7 @@
                             </p>
                         </div>
                     </div>
-                    
+
                     <div class="hidden sm:flex h-12 w-12 bg-primary-100 dark:bg-primary-900/30 rounded-full items-center justify-center text-primary-600 dark:text-primary-400">
                         <span class="material-symbols-outlined text-2xl">assignment_late</span>
                     </div>
@@ -136,6 +136,7 @@
 
                     @csrf
                     <input type="hidden" name="barang_id" value="{{ $barang->id }}">
+                    <input type="hidden" name="from" value="{{ request()->query('from') }}">
 
                     {{-- JENIS KERUSAKAN --}}
                     <div class="group">

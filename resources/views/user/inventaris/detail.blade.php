@@ -113,11 +113,10 @@
         <div class="flex items-center gap-6">
             @php
                 $from = request()->query('from');
-                if ($from === 'teknisi') {
-                    // Pastikan route dasbor teknisi Anda bernama 'user.teknisi.index'
-                    $backUrl = route('user.teknisi.index');
-                } elseif (str_contains(url()->previous(), '/rak/')) {
+                if (str_contains(url()->previous(), '/rak/')) {
                     $backUrl = url()->previous();
+                } elseif ($from === 'teknisi') {
+                    $backUrl = route('user.teknisi.index');
                 } else {
                     $backUrl = route('user.inventaris');
                 }
@@ -313,9 +312,7 @@
                         </div>
                     </div>
                 @else
-                    {{-- TOMBOL HANYA TAMPIL UNTUK USER -> PETUGAS INVENTARIS --}}
-                    @if(auth()->check() && auth()->user()->role == 'user' && optional(auth()->user()->jabatan)->jabatan == 'Petugas Inventaris')
-                    <a href="{{ route('user.inventaris.lapor-kerusakan.form', $barang->id) }}"
+                    <a href="{{ route('user.inventaris.lapor-kerusakan.form', ['id' => $barang->id, 'from' => request()->query('from')]) }}"
                         class="flex items-center justify-between p-6 bg-white rounded-3xl border border-rose-100 shadow-sm hover:shadow-xl hover:border-rose-300 transition-all duration-300 group">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all">
@@ -328,7 +325,6 @@
                         </div>
                         <span class="material-symbols-outlined text-slate-300 group-hover:translate-x-1 transition-transform">chevron_right</span>
                     </a>
-                    @endif
                 @endif
             </div>
 
