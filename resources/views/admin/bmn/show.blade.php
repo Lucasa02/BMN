@@ -34,15 +34,23 @@
 
                 <div class="flex items-center gap-3">
                     <a href="{{ route('barang.bmn_index', $ruangan) }}"
-                       class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 transition-all shadow-sm">
+                      class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 transition-all shadow-sm">
                         <span class="material-symbols-outlined text-lg">arrow_back</span>
                         <span class="text-xs font-bold uppercase tracking-wider">Kembali</span>
                     </a>
-                    <a href="{{ route('bmn.edit', [$ruangan, $barang->id]) }}"
-                       class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-[#1b365d]/20 dark:border-slate-700 rounded-2xl text-[#1b365d] dark:text-blue-300 hover:border-[#1b365d] transition-all shadow-sm">
-                        <span class="material-symbols-outlined text-lg">edit</span>
-                        <span class="text-xs font-bold uppercase tracking-wider">Sunting</span>
-                    </a>
+
+                    @if(!$sedang_maintenance && !$isRencanaPenghapusan)
+                        <a href="{{ route('bmn.edit', [$ruangan, $barang->id]) }}"
+                          class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-[#1b365d]/20 dark:border-slate-700 rounded-2xl text-[#1b365d] dark:text-blue-300 hover:border-[#1b365d] transition-all shadow-sm">
+                            <span class="material-symbols-outlined text-lg">edit</span>
+                            <span class="text-xs font-bold uppercase tracking-wider">Sunting</span>
+                        </a>
+                    @else
+                        <button disabled class="flex items-center gap-2 px-5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-70">
+                            <span class="material-symbols-outlined text-lg">edit</span>
+                            <span class="text-xs font-bold uppercase tracking-wider">Sunting</span>
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -285,17 +293,27 @@
                         @endif
 
                         {{-- Delete Action --}}
-                        <form action="{{ route('bmn.delete', [$ruangan, $barang->id]) }}" method="POST"
-                            onsubmit="return confirm('Sistem: Anda akan menghapus aset ini secara permanen dari basis data negara. Lanjutkan?')"
-                            class="pt-4 px-4 text-center">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                class="text-rose-400 hover:text-rose-600 text-[10px] font-black uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2 mx-auto">
-                                <span class="material-symbols-outlined text-sm">delete_forever</span>
-                                Hapus Arsip Aset
-                            </button>
-                        </form>
+                        @if(!$sedang_maintenance && !$isRencanaPenghapusan)
+                            <form action="{{ route('bmn.delete', [$ruangan, $barang->id]) }}" method="POST"
+                                onsubmit="return confirm('Sistem: Anda akan menghapus aset ini secara permanen dari basis data negara. Lanjutkan?')"
+                                class="pt-4 px-4 text-center">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="text-rose-400 hover:text-rose-600 text-[10px] font-black uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2 mx-auto">
+                                    <span class="material-symbols-outlined text-sm">delete_forever</span>
+                                    Hapus Arsip Aset
+                                </button>
+                            </form>
+                        @else
+                            <div class="pt-4 px-4 text-center">
+                                <button disabled title="Aset terkunci karena sedang dalam proses maintenance/penghapusan"
+                                    class="text-slate-400 cursor-not-allowed opacity-60 text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2 mx-auto">
+                                    <span class="material-symbols-outlined text-sm">delete_forever</span>
+                                    Hapus Arsip Aset (Terkunci)
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

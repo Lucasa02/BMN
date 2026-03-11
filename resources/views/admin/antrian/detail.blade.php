@@ -51,7 +51,11 @@
     {{-- KARTU UTAMA --}}
     <div class="glass-card-admin rounded-[2rem] overflow-hidden transition-all duration-500 relative animate-fade-in-up" style="animation-delay: 100ms;">
         {{-- Top Accent Gradient Line --}}
-        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#1b365d] via-blue-700 to-amber-500"></div>
+        @if($laporan->teknisi)
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#1b365d] to-blue-400"></div>
+        @else
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#1b365d] via-blue-700 to-amber-500"></div>
+        @endif
 
         <div class="p-8 sm:p-10 mt-2">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -62,6 +66,28 @@
                     <div class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-1 before:bottom-1 before:w-1.5 before:bg-gradient-to-b before:from-[#1b365d] before:to-amber-500 before:rounded-full animate-fade-in-up" style="animation-delay: 200ms;">
                         <label class="block text-[10px] font-bold uppercase tracking-widest text-[#1b365d]/60 dark:text-blue-300 mb-1.5">Identitas Aset / Barang</label>
                         <p class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white leading-tight">{{ $laporan->barang->nama_barang }}</p>
+                    </div>
+
+                    {{-- STATUS PENUGASAN (FITUR BARU) --}}
+                    <div class="bg-gray-50 dark:bg-gray-800/50 p-4 sm:p-5 rounded-2xl border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in-up" style="animation-delay: 250ms;">
+                        <div class="flex items-center gap-3">
+                            <div class="h-12 w-12 rounded-xl flex items-center justify-center text-xl font-bold {{ $laporan->teknisi ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800' : 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800' }}">
+                                <i class="{{ $laporan->teknisi ? 'fa-solid fa-user-gear' : 'fa-solid fa-hourglass-half' }}"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Status Penugasan</h4>
+                                @if($laporan->teknisi)
+                                    <p class="text-sm font-extrabold text-gray-800 dark:text-gray-200">Diambil oleh: <span class="text-blue-600 dark:text-blue-400">{{ $laporan->teknisi->nama_lengkap }}</span></p>
+                                @else
+                                    <p class="text-sm font-extrabold text-amber-600 dark:text-amber-400">Antrean Terbuka (Menunggu Teknisi)</p>
+                                @endif
+                            </div>
+                        </div>
+                        @if($laporan->teknisi)
+                            <div class="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold border border-blue-100 dark:border-blue-800/50 whitespace-nowrap">
+                                Sedang Diproses
+                            </div>
+                        @endif
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 animate-fade-in-up" style="animation-delay: 300ms;">

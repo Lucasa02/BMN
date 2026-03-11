@@ -15,7 +15,7 @@ class AntreanPerbaikanController extends Controller
     {
         $title = 'Antrean Perbaikan';
 
-        $laporan_disetujui = LaporanKerusakan::with(['barang', 'user'])
+        $laporan_disetujui = LaporanKerusakan::with(['barang', 'user', 'teknisi'])
             ->where('status', 'disetujui')
             ->orderBy('updated_at', 'desc')
             ->paginate(12);
@@ -26,12 +26,11 @@ class AntreanPerbaikanController extends Controller
     public function detail($uuid)
     {
         $title = 'Detail Antrean Perbaikan';
-        $laporan = LaporanKerusakan::with(['barang', 'user'])->where('uuid', $uuid)->firstOrFail();
+        $laporan = LaporanKerusakan::with(['barang', 'user', 'teknisi'])->where('uuid', $uuid)->firstOrFail();
 
         return view('admin.antrian.detail', compact('laporan', 'title'));
     }
 
-    // METHOD BARU UNTUK LOGBOOK ADMIN YANG DISEderhanakan
     public function logbook(Request $request)
     {
         $title = 'Logbook Tim Perbaikan';

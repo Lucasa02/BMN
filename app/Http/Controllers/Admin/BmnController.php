@@ -453,9 +453,9 @@ class BmnController extends Controller
 
     // Cek maintenance (perbaikan biasa)
     $cek_perawatan = $barang->perawatan()
-        ->whereIn('status', ['pending', 'proses'])
-        ->where('jenis_perawatan', '!=', 'rencana_penghapusan')
-        ->exists();
+    ->where('status', '!=', 'selesai')
+    ->where('jenis_perawatan', '!=', 'rencana_penghapusan')
+    ->exists();
 
     $cek_laporan = \App\Models\LaporanKerusakan::where('barang_id', $id)
         ->whereIn('status', ['disetujui', 'proses'])

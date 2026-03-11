@@ -242,10 +242,10 @@
                         // 1. Cek Rencana Penghapusan (Prioritas Utama)
                         $isRencanaPenghapusan = $b->perawatan->where('jenis_perawatan', 'rencana_penghapusan')->isNotEmpty();
 
-                        // 2. Cek Maintenance Biasa (Tidak termasuk rencana penghapusan)
+                        // 2. Cek Maintenance Biasa (Selama belum 'selesai', maka statusnya maintenance)
                         $cek_perawatan = $b->perawatan
                             ->where('jenis_perawatan', '!=', 'rencana_penghapusan')
-                            ->whereIn('status', ['pending', 'proses'])
+                            ->where('status', '!=', 'selesai')
                             ->count() > 0;
 
                         $cek_laporan = \App\Models\LaporanKerusakan::where('barang_id', $b->id)
@@ -348,16 +348,25 @@
                                 </a>
 
                                 @if (Auth::user()->role == 'superadmin')
-                                    <a href="{{ route('bmn.edit', [strtolower($b->ruangan), $b->id]) }}"
-                                        class="p-2.5 bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white rounded-xl transition-all shadow-sm">
-                                        <i class="fa-regular fa-pen-to-square text-sm"></i>
-                                    </a>
-                                    <button
-                                        onclick="confirmDelete('{{ route('bmn.delete', [strtolower($b->ruangan), $b->id]) }}')"
-                                        data-modal-target="delete-modal" data-modal-toggle="delete-modal"
-                                        class="p-2.5 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white rounded-xl transition-all shadow-sm">
-                                        <i class="fa-regular fa-trash-can text-sm"></i>
-                                    </button>
+                                    @if(!$sedang_maintenance && !$isRencanaPenghapusan)
+                                        <a href="{{ route('bmn.edit', [strtolower($b->ruangan), $b->id]) }}"
+                                            class="p-2.5 bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white rounded-xl transition-all shadow-sm">
+                                            <i class="fa-regular fa-pen-to-square text-sm"></i>
+                                        </a>
+                                        <button
+                                            onclick="confirmDelete('{{ route('bmn.delete', [strtolower($b->ruangan), $b->id]) }}')"
+                                            data-modal-target="delete-modal" data-modal-toggle="delete-modal"
+                                            class="p-2.5 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white rounded-xl transition-all shadow-sm">
+                                            <i class="fa-regular fa-trash-can text-sm"></i>
+                                        </button>
+                                    @else
+                                        <button disabled class="p-2.5 bg-gray-100 text-gray-400 rounded-xl cursor-not-allowed opacity-70" title="Aset Sedang Maintenance">
+                                            <i class="fa-regular fa-pen-to-square text-sm"></i>
+                                        </button>
+                                        <button disabled class="p-2.5 bg-gray-100 text-gray-400 rounded-xl cursor-not-allowed opacity-70" title="Aset Sedang Maintenance">
+                                            <i class="fa-regular fa-trash-can text-sm"></i>
+                                        </button>
+                                    @endif
                                 @endif
                             </div>
                         </div>

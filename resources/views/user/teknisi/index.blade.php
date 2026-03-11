@@ -185,81 +185,113 @@
   <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-20 pb-24">
     <div class="glass-card rounded-2xl p-6 sm:p-8 animate-fade-in-up delay-100">
 
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-4 border-b border-gray-100 gap-4">
-        <div>
-          <h2 class="text-2xl font-extrabold text-[#1b365d] flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-[#d4af37]" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-            </svg>
-            Antrean Perbaikan
-          </h2>
-          <p class="text-sm text-slate-500 mt-1 font-medium">Daftar inventaris yang menunggu tindakan perbaikan.</p>
-        </div>
-        <div class="bg-[#1b365d]/5 border border-[#1b365d]/10 px-4 py-2 rounded-lg flex items-center gap-2">
-          <span class="relative flex h-3 w-3">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1b365d] opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-3 w-3 bg-[#1b365d]"></span>
-          </span>
-          <span class="text-[#1b365d] font-bold text-sm">{{ isset($laporan_disetujui) ? $laporan_disetujui->count() : 0 }} Tugas Tersedia</span>
+      <div class="flex flex-col sm:flex-row items-center justify-between mb-8 pb-4 border-b border-gray-100 gap-4">
+        <div class="flex space-x-2 bg-slate-100 p-1.5 rounded-xl w-full sm:w-auto">
+            <button onclick="switchTab('tugas-saya')" id="tab-btn-tugas-saya" class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all bg-white text-[#1b365d] shadow-sm flex items-center justify-center gap-2">
+                Tugas Saya
+                <span class="bg-rose-100 text-rose-600 text-[10px] px-2 py-0.5 rounded-full">{{ isset($tugas_saya) ? $tugas_saya->count() : 0 }}</span>
+            </button>
+            <button onclick="switchTab('antrean-terbuka')" id="tab-btn-antrean-terbuka" class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all text-slate-500 hover:text-[#1b365d] flex items-center justify-center gap-2">
+                Antrean Terbuka
+                <span class="bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded-full">{{ isset($antrean_tersedia) ? $antrean_tersedia->count() : 0 }}</span>
+            </button>
         </div>
       </div>
 
-      @if(!isset($laporan_disetujui) || $laporan_disetujui->isEmpty())
-        <div class="flex flex-col items-center justify-center py-16 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200">
-          <div class="bg-white p-4 rounded-full shadow-sm mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold text-[#1b365d] mb-1">Semua Tugas Selesai</h3>
-          <p class="text-slate-500 font-medium text-center">Belum ada antrean perbaikan BMN saat ini. Kerja bagus!</p>
-        </div>
-      @else
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @foreach ($laporan_disetujui as $index => $l)
-          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-400 flex flex-col group overflow-hidden animate-fade-in-up" style="animation-delay: {{ ($index + 2) * 100 }}ms;">
-
-            <div class="p-5 flex gap-4 relative">
-              <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#1b365d] to-[#d4af37]"></div>
-
-              <div class="w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-slate-100 shadow-inner">
-                <img src="{{ $l->barang->foto ? asset('storage/' . $l->barang->foto) : asset('img/no-image.png') }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Barang">
-              </div>
-              <div class="flex-1 min-w-0 py-1">
-                <span class="inline-block bg-rose-50 text-rose-700 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider mb-2 border border-rose-100">{{ $l->jenis_kerusakan }}</span>
-                <h3 class="font-extrabold text-[#1b365d] text-base truncate">{{ $l->barang->nama_barang }}</h3>
-                <p class="text-[11px] text-slate-400 mt-1 font-medium flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Disetujui: {{ $l->updated_at->format('d M Y') }}
-                </p>
-              </div>
-            </div>
-
-            <div class="px-5 pb-5 flex-1">
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 h-20 relative">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-300 absolute top-2 left-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+      <div id="tab-tugas-saya" class="tab-content block">
+          @if(!isset($tugas_saya) || $tugas_saya->isEmpty())
+            <div class="flex flex-col items-center justify-center py-16 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200">
+              <div class="bg-white p-4 rounded-full shadow-sm mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
-                <p class="text-xs text-slate-600 font-medium italic line-clamp-3 pl-5 leading-relaxed">
-                  {{ $l->deskripsi }}
-                </p>
               </div>
+              <h3 class="text-xl font-bold text-[#1b365d] mb-1">Belum Ada Tugas</h3>
+              <p class="text-slate-500 font-medium text-center">Silakan ambil tugas dari tab Antrean Terbuka.</p>
             </div>
+          @else
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              @foreach ($tugas_saya as $index => $l)
+              <div class="bg-white rounded-2xl border-2 border-[#1b365d]/10 shadow-sm hover:shadow-xl transition-all duration-400 flex flex-col group overflow-hidden">
+                <div class="p-5 flex gap-4 relative">
+                  <div class="w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-slate-100">
+                    <img src="{{ $l->barang->foto ? asset('storage/' . $l->barang->foto) : asset('img/no-image.png') }}" class="w-full h-full object-cover">
+                  </div>
+                  <div class="flex-1 min-w-0 py-1">
+                    <span class="inline-block bg-blue-50 text-[#1b365d] text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider mb-2">Diproses Saya</span>
+                    <h3 class="font-extrabold text-[#1b365d] text-base truncate">{{ $l->barang->nama_barang }}</h3>
+                    <p class="text-[11px] text-slate-400 mt-1 font-medium">{{ $l->jenis_kerusakan }}</p>
+                  </div>
+                </div>
+                <div class="p-4 pt-0 mt-auto flex gap-2">
+                  <a href="{{ route('user.teknisi.detail', $l->uuid) }}" class="flex-1 flex justify-center items-center bg-[#1b365d] text-white hover:bg-[#2a5298] text-sm font-bold py-2.5 rounded-xl transition-all">
+                    Lanjutkan
+                  </a>
+                  <form action="{{ route('user.teknisi.batal-klaim', $l->uuid) }}" method="POST">
+                    @csrf
+                    <button type="submit" onclick="return confirm('Kembalikan tugas ini ke antrean?')" class="flex justify-center items-center bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white px-4 py-2.5 rounded-xl font-bold transition-all">
+                      Batal
+                    </button>
+                  </form>
+                </div>
+              </div>
+              @endforeach
+            </div>
+          @endif
+      </div>
 
-            <div class="p-4 pt-0">
-              <a href="{{ route('user.teknisi.detail', $l->uuid) }}" class="flex justify-center items-center gap-2 w-full text-center bg-white border-2 border-[#1b365d] text-[#1b365d] hover:bg-[#1b365d] hover:text-white text-sm font-bold py-2.5 rounded-xl transition-all duration-300 group/btn">
-                Tindak Lanjut
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+      <div id="tab-antrean-terbuka" class="tab-content hidden">
+          @if(!isset($antrean_tersedia) || $antrean_tersedia->isEmpty())
+            <div class="flex flex-col items-center justify-center py-16 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200">
+              <div class="bg-white p-4 rounded-full shadow-sm mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7" />
                 </svg>
-              </a>
+              </div>
+              <h3 class="text-xl font-bold text-[#1b365d] mb-1">Semua Antrean Kosong</h3>
+              <p class="text-slate-500 font-medium text-center">Belum ada laporan perbaikan BMN baru saat ini.</p>
             </div>
-          </div>
-          @endforeach
-        </div>
-      @endif
+          @else
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              @foreach ($antrean_tersedia as $index => $l)
+              <div class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-400 flex flex-col group overflow-hidden">
+                <div class="p-5 flex gap-4 relative">
+                  <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 to-emerald-300"></div>
+                  <div class="w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-slate-100">
+                    <img src="{{ $l->barang->foto ? asset('storage/' . $l->barang->foto) : asset('img/no-image.png') }}" class="w-full h-full object-cover">
+                  </div>
+                  <div class="flex-1 min-w-0 py-1">
+                    <span class="inline-block bg-rose-50 text-rose-700 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider mb-2 border border-rose-100">{{ $l->jenis_kerusakan }}</span>
+                    <h3 class="font-extrabold text-[#1b365d] text-base truncate">{{ $l->barang->nama_barang }}</h3>
+                    <p class="text-[11px] text-slate-400 mt-1 font-medium flex items-center gap-1">
+                      Menunggu Teknisi
+                    </p>
+                  </div>
+                </div>
+                <div class="px-5 pb-5 flex-1">
+                  <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 h-20">
+                    <p class="text-xs text-slate-600 font-medium italic line-clamp-3 leading-relaxed">
+                      "{{ $l->deskripsi }}"
+                    </p>
+                  </div>
+                </div>
+                <div class="p-4 pt-0">
+                  <form action="{{ route('user.teknisi.klaim', $l->uuid) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="w-full flex justify-center items-center gap-2 bg-white border-2 border-[#d4af37] text-[#1b365d] hover:bg-[#d4af37] hover:text-white text-sm font-bold py-2.5 rounded-xl transition-all duration-300">
+                      Ambil Tugas Ini
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+              </div>
+              @endforeach
+            </div>
+          @endif
+      </div>
+
     </div>
   </section>
 
@@ -311,6 +343,20 @@
   @notifyJs
 
   <script>
+    // Tab Logic
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('[id^="tab-btn-"]').forEach(el => {
+            el.classList.remove('bg-white', 'text-[#1b365d]', 'shadow-sm');
+            el.classList.add('text-slate-500');
+        });
+        document.getElementById('tab-' + tabId).classList.remove('hidden');
+        const activeBtn = document.getElementById('tab-btn-' + tabId);
+        activeBtn.classList.remove('text-slate-500');
+        activeBtn.classList.add('bg-white', 'text-[#1b365d]', 'shadow-sm');
+    }
+
+    // Scanner Logic
     let html5QrCode = null;
     let scanningActive = false;
     let scannerAllowed = true;
@@ -319,18 +365,9 @@
       scannerAllowed = !window.location.pathname.match(/^\/user\/scan-barang\/.+/);
     }
 
-    function showScannerModal() {
-      document.getElementById('scan-camera-modal').classList.remove('hidden');
-    }
-
-    function hideScannerModal() {
-      document.getElementById('scan-camera-modal').classList.add('hidden');
-    }
-
-    function cleanScannedString(s) {
-      if (!s || typeof s !== 'string') return s;
-      return s.trim().replace(/[\u0000-\u001F\u007F]+/g, "").replace(/\s+/g, " ");
-    }
+    function showScannerModal() { document.getElementById('scan-camera-modal').classList.remove('hidden'); }
+    function hideScannerModal() { document.getElementById('scan-camera-modal').classList.add('hidden'); }
+    function cleanScannedString(s) { return (!s || typeof s !== 'string') ? s : s.trim().replace(/[\u0000-\u001F\u007F]+/g, "").replace(/\s+/g, " "); }
 
     function stopScanner() {
       scanningActive = false;
@@ -353,56 +390,39 @@
       html5QrCode = new Html5Qrcode("reader");
       scanningActive = true;
 
-      const config = {
-        fps: 20,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0
-      };
+      const config = { fps: 20, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
 
       html5QrCode.start({ facingMode: "environment" }, config, rawMessage => {
         stopScanner();
-
         let qrMessage = cleanScannedString(rawMessage || "");
         if (!qrMessage) return;
 
         document.getElementById('loading-animation').style.display = 'flex';
-
         let finalUrl = "";
+
         if (qrMessage.includes("/user/scan-barang/")) {
           const parts = qrMessage.split("/");
           const kodeBarang = parts.pop() || parts.pop();
-          if (kodeBarang) {
-            finalUrl = "/user/scan-barang/" + encodeURIComponent(kodeBarang) + "?from=teknisi";
-          }
+          if (kodeBarang) finalUrl = "/user/scan-barang/" + encodeURIComponent(kodeBarang) + "?from=teknisi";
         } else {
           try {
             const parsed = new URL(qrMessage);
             finalUrl = parsed.href;
-            // Tambahkan parameter dengan aman jika URL sudah memiliki query string
             finalUrl += (finalUrl.includes('?') ? '&' : '?') + 'from=teknisi';
           } catch (e) {
             finalUrl = "/user/scan-barang/" + encodeURIComponent(qrMessage) + "?from=teknisi";
           }
         }
 
-        setTimeout(() => {
-          if (finalUrl) location.assign(finalUrl);
-        }, 1800);
-
+        setTimeout(() => { if (finalUrl) location.assign(finalUrl); }, 1800);
       }).catch(err => {
         scanningActive = false;
         hideScannerModal();
       });
     }
 
-    document.getElementById('btn-close-scanner').addEventListener('click', function (e) {
-      e.preventDefault();
-      stopScanner();
-    });
-
-    document.addEventListener('keydown', function (e) {
-      if (e.key === "Escape") stopScanner();
-    });
+    document.getElementById('btn-close-scanner').addEventListener('click', function (e) { e.preventDefault(); stopScanner(); });
+    document.addEventListener('keydown', function (e) { if (e.key === "Escape") stopScanner(); });
   </script>
 </body>
 </html>

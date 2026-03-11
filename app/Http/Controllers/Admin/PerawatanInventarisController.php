@@ -137,8 +137,7 @@ class PerawatanInventarisController extends Controller
             'status' => 'pending',
         ]);
 
-        // <-- FIX BAGIAN INI
-    return redirect()->route('data_penghapusan.index')
+    return redirect()->route('rencana_penghapusan.index')
                     ->with('success', 'Barang berhasil masuk ke Data Penghapusan.');
     }
 

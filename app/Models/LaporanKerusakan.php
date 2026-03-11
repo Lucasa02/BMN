@@ -13,6 +13,7 @@ class LaporanKerusakan extends Model
     protected $fillable = [
         'uuid',
         'barang_id',
+        'teknisi_id',
         'user_id',
         'jenis_kerusakan',
         'deskripsi',
@@ -36,5 +37,11 @@ class LaporanKerusakan extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // Relasi baru ke teknisi
+    public function teknisi()
+    {
+        return $this->belongsTo(User::class, 'teknisi_id');
     }
 }

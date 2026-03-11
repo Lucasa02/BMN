@@ -15,23 +15,73 @@ class TeknisiController extends Controller
 {
     public function index()
     {
-        $laporan_disetujui = LaporanKerusakan::with(['barang', 'user'])
+        $userId = Auth::id();
+
+        // 1. Antrean Terbuka (Belum diklaim siapapun)
+        $antrean_tersedia = LaporanKerusakan::with(['barang', 'user'])
             ->where('status', 'disetujui')
+            ->whereNull('teknisi_id')
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        return view('user.teknisi.index', compact('laporan_disetujui'));
+        // 2. Tugas Saya (Sudah diklaim oleh teknisi yang login)
+        $tugas_saya = LaporanKerusakan::with(['barang', 'user'])
+            ->where('status', 'disetujui')
+            ->where('teknisi_id', $userId)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return view('user.teknisi.index', compact('antrean_tersedia', 'tugas_saya'));
+    }
+
+    public function klaim($uuid)
+    {
+        // Update langsung untuk mencegah Race Condition
+        $updated = LaporanKerusakan::where('uuid', $uuid)
+            ->where('status', 'disetujui')
+            ->whereNull('teknisi_id')
+            ->update([
+                'teknisi_id' => Auth::id(),
+                'updated_at' => now()
+            ]);
+
+        if ($updated) {
+            return redirect()->back()->with('success', 'Tugas berhasil diambil alih!');
+        }
+
+        return redirect()->back()->with('error', 'Maaf, tugas ini sudah diklaim oleh teknisi lain.');
+    }
+
+    public function batalKlaim($uuid)
+    {
+        LaporanKerusakan::where('uuid', $uuid)
+            ->where('teknisi_id', Auth::id())
+            ->update([
+                'teknisi_id' => null,
+                'updated_at' => now()
+            ]);
+
+        return redirect()->back()->with('info', 'Tugas berhasil dikembalikan ke antrean.');
     }
 
     public function detail($uuid)
     {
-        $laporan = LaporanKerusakan::with(['barang', 'user'])->where('uuid', $uuid)->firstOrFail();
+        // PERKETAT KEAMANAN: Pastikan hanya teknisi yang mengklaim yang bisa buka detail
+        $laporan = LaporanKerusakan::with(['barang', 'user'])
+            ->where('uuid', $uuid)
+            ->where('teknisi_id', Auth::id())
+            ->firstOrFail();
+
         return view('user.teknisi.detail', compact('laporan'));
     }
 
     public function perbaikan($uuid)
     {
-        $laporan = LaporanKerusakan::with(['barang'])->where('uuid', $uuid)->firstOrFail();
+        $laporan = LaporanKerusakan::with(['barang'])
+            ->where('uuid', $uuid)
+            ->where('teknisi_id', Auth::id()) // Perketat juga di sini
+            ->firstOrFail();
+
         return view('user.teknisi.perbaikan', compact('laporan'));
     }
 

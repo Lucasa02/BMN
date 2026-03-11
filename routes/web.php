@@ -344,6 +344,8 @@ Route::prefix('user')->group(function () {
 
 Route::prefix('user/teknisi')->middleware(['auth', 'role:tim_perbaikan'])->name('user.teknisi.')->group(function () {
     Route::get('/', [TeknisiController::class, 'index'])->name('index');
+    Route::post('/klaim/{uuid}', [TeknisiController::class, 'klaim'])->name('klaim');
+    Route::post('/batal-klaim/{uuid}', [TeknisiController::class, 'batalKlaim'])->name('batal-klaim');
     Route::get('/detail/{uuid}', [TeknisiController::class, 'detail'])->name('detail');
     Route::get('/perbaikan/{uuid}', [TeknisiController::class, 'perbaikan'])->name('perbaikan');
     Route::post('/perbaikan/{uuid}', [TeknisiController::class, 'perbaikanSubmit'])->name('perbaikanSubmit');

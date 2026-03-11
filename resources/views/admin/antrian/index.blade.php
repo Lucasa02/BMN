@@ -70,8 +70,12 @@
         @foreach ($laporan_disetujui as $l)
         <div class="animate-fade-in-up bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-2xl hover:shadow-[#1b365d]/10 hover:-translate-y-1.5 transition-all duration-500 ease-out flex flex-col group overflow-hidden relative" style="animation-delay: {{ $loop->iteration * 75 }}ms;">
 
-            {{-- Top Accent Gradient --}}
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1b365d] via-blue-700 to-amber-400 opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
+            {{-- Top Accent Gradient (Menyesuaikan warna berdasarkan status klaim) --}}
+            @if($l->teknisi)
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1b365d] to-blue-400 opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
+            @else
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-amber-300 opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
+            @endif
 
             <div class="p-5 flex gap-4 mt-1">
                 {{-- Gambar Barang --}}
@@ -81,14 +85,23 @@
                 </div>
 
                 <div class="flex-1 min-w-0 py-0.5">
-                    <span class="inline-block bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-widest mb-2 border border-red-100 dark:border-red-800/50 shadow-sm">
+                    <span class="inline-block bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-widest mb-1.5 border border-red-100 dark:border-red-800/50 shadow-sm">
                         {{ str_replace('_', ' ', $l->jenis_kerusakan) }}
                     </span>
                     <h3 class="font-bold text-gray-800 dark:text-white text-base truncate group-hover:text-[#1b365d] dark:group-hover:text-blue-300 transition-colors duration-300">{{ $l->barang->nama_barang }}</h3>
-                    <p class="text-[11px] text-gray-400 mt-1.5 font-semibold flex items-center gap-1.5">
-                        <i class="fa-regular fa-calendar-check text-[#1b365d]/70 dark:text-blue-400"></i>
-                        {{ $l->updated_at->format('d M Y') }}
-                    </p>
+
+                    {{-- Indikator Status Klaim Tugas --}}
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        @if($l->teknisi)
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#1b365d] border border-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/50">
+                                <i class="fa-solid fa-user-wrench"></i> {{ explode(' ', $l->teknisi->nama_lengkap)[0] }}
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50">
+                                <i class="fa-solid fa-hourglass-half"></i> Antrean Terbuka
+                            </span>
+                        @endif
+                    </div>
                 </div>
             </div>
 
@@ -99,6 +112,10 @@
                         {{ $l->deskripsi }}
                     </p>
                 </div>
+                <p class="text-[10px] text-gray-400 mt-2 font-semibold flex items-center justify-end gap-1.5">
+                    <i class="fa-regular fa-calendar-check"></i>
+                    Disetujui: {{ $l->updated_at->format('d M Y') }}
+                </p>
             </div>
 
             <div class="p-5 pt-0">
