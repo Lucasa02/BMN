@@ -409,20 +409,24 @@ class BmnController extends Controller
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
             $name = time() . "_barang." . $file->getClientOriginalExtension();
+
+            // Hanya resize maksimal 800px tanpa menambah background putih
             $img = $manager->read($file)->scaleDown(800, 800);
-            $canvas = $manager->create(800, 800)->fill('#ffffff')->place($img, 'center');
+
             $path = 'bmn/foto/' . $name;
-            Storage::disk('public')->put($path, $canvas->encodeByExtension($file->getClientOriginalExtension(), quality: 80));
+            Storage::disk('public')->put($path, $img->encodeByExtension($file->getClientOriginalExtension(), quality: 80));
             $validated['foto'] = $path;
         }
 
         if ($request->hasFile('posisi')) {
             $file   = $request->file('posisi');
             $name   = time() . "_posisi." . $file->getClientOriginalExtension();
+
+            // Hanya resize maksimal 800px tanpa menambah background putih
             $img    = $manager->read($file)->scaleDown(800, 800);
-            $canvas = $manager->create(800, 800)->fill('#ffffff')->place($img, 'center');
+
             $path = 'bmn/posisi/' . $name;
-            Storage::disk('public')->put($path, $canvas->encodeByExtension($file->getClientOriginalExtension(), quality: 80));
+            Storage::disk('public')->put($path, $img->encodeByExtension($file->getClientOriginalExtension(), quality: 80));
             $validated['posisi'] = $path;
         }
 
@@ -531,10 +535,11 @@ class BmnController extends Controller
             if ($barang->foto) Storage::disk('public')->delete($barang->foto);
             $file = $request->file('foto');
             $name = time() . "_barang." . $file->getClientOriginalExtension();
+
             $img = $manager->read($file)->scaleDown(800, 800);
-            $canvas = $manager->create(800, 800)->fill('#ffffff')->place($img, 'center');
+
             $path = 'bmn/foto/' . $name;
-            Storage::disk('public')->put($path, $canvas->encodeByExtension($file->getClientOriginalExtension(), quality: 80));
+            Storage::disk('public')->put($path, $img->encodeByExtension($file->getClientOriginalExtension(), quality: 80));
             $validated['foto'] = $path;
         }
 
@@ -542,10 +547,11 @@ class BmnController extends Controller
             if ($barang->posisi) Storage::disk('public')->delete($barang->posisi);
             $file = $request->file('posisi');
             $name = time() . "_posisi." . $file->getClientOriginalExtension();
+
             $img = $manager->read($file)->scaleDown(800, 800);
-            $canvas = $manager->create(800, 800)->fill('#ffffff')->place($img, 'center');
+
             $path = 'bmn/posisi/' . $name;
-            Storage::disk('public')->put($path, $canvas->encodeByExtension($file->getClientOriginalExtension(), quality: 80));
+            Storage::disk('public')->put($path, $img->encodeByExtension($file->getClientOriginalExtension(), quality: 80));
             $validated['posisi'] = $path;
         }
 

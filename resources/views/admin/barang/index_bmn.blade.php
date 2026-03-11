@@ -285,7 +285,7 @@
                             </div>
 
                             <img src="{{ $fotoPath }}" alt="{{ $b->nama_barang }}"
-                                class="w-full h-full object-contain p-8 group-hover:scale-110 transition-transform duration-700 ease-out {{ ($sedang_maintenance || $isRencanaPenghapusan) ? 'grayscale opacity-80' : '' }}">
+                                class="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-700 ease-out {{ ($sedang_maintenance || $isRencanaPenghapusan) ? 'grayscale opacity-80' : '' }}">
 
                             <div class="absolute inset-0 bg-gradient-to-t from-[#1b365d]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             </div>

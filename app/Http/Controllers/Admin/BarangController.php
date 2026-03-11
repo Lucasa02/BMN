@@ -247,7 +247,7 @@ class BarangController extends Controller
             $canvas = $manager->create(500, 500)->fill('#ffffff');
             $canvas->place($image, 'center');
 
-            $encoded = $canvas->encodeByExtension($file->getClientOriginalExtension(), quality: 80);
+            $encoded = $image->encodeByExtension($file->getClientOriginalExtension(), quality: 80);
 
             Storage::disk('public')->put('uploads/foto_barang/' . $filename, $encoded);
         }

@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link rel="shortcut icon" href="{{ asset('img/assets/bg_esimba.png') }}" type="image/x-icon" />
     <title>Lapor Kondisi Barang - Report Damaged Item</title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>

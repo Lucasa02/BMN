@@ -12,11 +12,17 @@ use Illuminate\Support\Facades\Storage;
 
 class PerawatanInventarisController extends Controller
 {
-    public function index(Request $request) // Tambahkan Request $request untuk menangani filter jika diperlukan
+    public function index(Request $request)
     {
+        // 1. Ambil ID barang yang sudah ditarik ke daftar Rencana Penghapusan
+        $barangDihapusIds = PerawatanInventaris::where('jenis_perawatan', 'rencana_penghapusan')
+            ->pluck('barang_id');
+
+        // 2. Filter query utama agar barang yang mau dihapus hilang dari antrean
         $query = PerawatanInventaris::with('barang')
             ->where('jenis_perawatan', 'perbaikan')
-            ->where('status', '!=', 'selesai'); // <-- TAMBAHKAN BARIS INI agar yang selesai tidak muncul
+            ->where('status', '!=', 'selesai')
+            ->whereNotIn('barang_id', $barangDihapusIds); // <-- Tambahkan logika ini
 
         // (Opsional) Jika Anda ingin filter di view tetap berfungsi untuk 'search'
         if ($request->has('search') && $request->search != '') {
@@ -116,10 +122,7 @@ class PerawatanInventarisController extends Controller
         $item = PerawatanInventaris::with('barang')->findOrFail($id);
         $barang_id = $item->barang_id;
 
-        // hapus record perbaikan / rencana lama
-        $item->delete();
-
-        // cek duplicate rencana_penghapusan
+        // Cek duplicate rencana_penghapusan
         $cek = PerawatanInventaris::where('barang_id', $barang_id)
             ->where('jenis_perawatan', 'rencana_penghapusan')
             ->whereIn('status', ['pending', 'proses'])
@@ -127,6 +130,10 @@ class PerawatanInventarisController extends Controller
 
         if ($cek) {
             return back()->with('error', 'Barang ini sudah ada dalam rencana penghapusan!');
+        }
+
+        if (!in_array($item->status, ['diperbaiki', 'tidak_dapat_diperbaiki'])) {
+            $item->delete();
         }
 
         PerawatanInventaris::create([
@@ -137,8 +144,8 @@ class PerawatanInventarisController extends Controller
             'status' => 'pending',
         ]);
 
-    return redirect()->route('rencana_penghapusan.index')
-                    ->with('success', 'Barang berhasil masuk ke Data Penghapusan.');
+        return redirect()->route('rencana_penghapusan.index')
+                        ->with('success', 'Barang berhasil masuk ke Data Penghapusan.');
     }
 
     public function verifikasiSelesai($id)
