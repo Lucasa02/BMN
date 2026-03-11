@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Kinerja Teknisi</title>
+    <title>Laporan Kinerja Perbaikan</title>
     <style>
         body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12px; color: #333; }
         .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2c3e50; padding-bottom: 10px; }
@@ -22,19 +22,19 @@
         .signature-box { float: right; width: 300px; text-align: center; }
         .signature-line { margin-top: 70px; border-bottom: 1px solid #000; font-weight: bold; }
 
-        .status-badge { background: #27ae60; color: white; padding: 2px 5px; border-radius: 3px; font-size: 10px; }
+        .status-badge { color: white; padding: 4px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h2>Laporan Kinerja Perbaikan Inventaris</h2>
-        <p>Logbook Resmi Teknisi</p>
+        <p>Logbook Resmi Tim Perbaikan</p>
     </div>
 
     <table class="info-table">
         <tr>
-            <td width="120">Nama Teknisi</td>
+            <td width="120">Nama Tim Perbaikan</td>
             <td width="10">:</td>
             <td>{{ Auth::user()->nama_lengkap }}</td>
             <td width="120">Tanggal Cetak</td>
@@ -45,12 +45,11 @@
             <td>NIP / ID</td>
             <td>:</td>
             <td>{{ Auth::user()->nip ?? '-' }}</td>
-            <td>Total Diselesaikan</td>
+            <td>Total Tercatat</td>
             <td>:</td>
             <td>{{ $logbook->count() }} Unit Barang</td>
         </tr>
         <tr>
-            {{-- Tambahan keterangan periode filter yang dicetak --}}
             <td>Periode Laporan</td>
             <td>:</td>
             <td colspan="4" style="color: #c0392b;">{{ $periodeText }}</td>
@@ -70,13 +69,29 @@
         </thead>
         <tbody>
             @forelse($logbook as $index => $l)
+            @php
+                // Logika Pewarnaan Background Status untuk PDF
+                $bgColor = '#95a5a6'; // Abu-abu default (Proses/dll)
+                if($l->status == 'selesai') {
+                    $bgColor = '#27ae60'; // Hijau
+                } elseif($l->status == 'diperbaiki') {
+                    $bgColor = '#2980b9'; // Biru
+                } elseif($l->status == 'tidak_dapat_diperbaiki') {
+                    $bgColor = '#e74c3c'; // Merah
+                } elseif($l->status == 'proses') {
+                    $bgColor = '#f39c12'; // Oranye
+                }
+                $statusLabel = str_replace('_', ' ', $l->status);
+            @endphp
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $l->updated_at->format('d/m/Y H:i') }}</td>
                 <td><strong>{{ $l->barang->nama_barang ?? 'Barang Dihapus' }}</strong><br><small>{{ $l->barang->kode_barang ?? '' }}</small></td>
                 <td>{!! nl2br(e($l->deskripsi)) !!}</td>
                 <td>Rp {{ number_format($l->biaya, 0, ',', '.') }}</td>
-                <td style="text-align: center;"><span class="status-badge">SELESAI</span></td>
+                <td style="text-align: center;">
+                    <span class="status-badge" style="background-color: {{ $bgColor }};">{{ $statusLabel }}</span>
+                </td>
             </tr>
             @empty
             <tr>
@@ -91,7 +106,7 @@
             <p>Mengetahui / Melaporkan,</p>
             <br>
             <div class="signature-line">{{ Auth::user()->nama_lengkap }}</div>
-            <p style="margin-top: 5px;">Teknisi</p>
+            <p style="margin-top: 5px;">Perbaikan</p>
         </div>
         <div style="clear: both;"></div>
     </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Logbook Teknisi | BMN</title>
+  <title>Logbook Tim Perbaikan | BMN</title>
   @notifyCss
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -179,7 +179,7 @@
       <div class="mb-6">
         <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold px-3 py-1.5 rounded-lg shadow-sm">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          {{ $logbook->total() }} Pekerjaan Diselesaikan
+          {{ $logbook->total() }} Pekerjaan Tercatat
         </span>
       </div>
 
@@ -191,15 +191,36 @@
             </svg>
           </div>
           <h3 class="text-xl font-bold text-[#1b365d] mb-1">Belum Ada Riwayat</h3>
-          <p class="text-slate-500 font-medium text-center">Tidak ditemukan data perbaikan yang selesai pada periode ini.</p>
+          <p class="text-slate-500 font-medium text-center">Tidak ditemukan data perbaikan yang dikerjakan pada periode ini.</p>
         </div>
       @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           @foreach ($logbook as $index => $l)
+
+          @php
+              // Logika Pewarnaan Badge & Ikon berdasarkan Status
+              $badgeBg = 'bg-slate-50 border-slate-200 text-slate-700';
+              $iconPath = '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />'; // Ikon default: Jam/Proses
+              $statusText = str_replace('_', ' ', $l->status);
+
+              if($l->status == 'selesai') {
+                  $badgeBg = 'bg-emerald-50 border-emerald-200 text-emerald-700';
+                  $iconPath = '<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />';
+              } elseif($l->status == 'diperbaiki') {
+                  $badgeBg = 'bg-blue-50 border-blue-200 text-blue-700';
+                  $iconPath = '<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />';
+              } elseif($l->status == 'tidak_dapat_diperbaiki') {
+                  $badgeBg = 'bg-red-50 border-red-200 text-red-700';
+                  $iconPath = '<path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />';
+              } elseif($l->status == 'proses') {
+                  $badgeBg = 'bg-amber-50 border-amber-200 text-amber-700';
+              }
+          @endphp
+
           <div class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-400 flex flex-col group overflow-hidden animate-fade-in-up" style="animation-delay: {{ ($index % 6) * 100 }}ms;">
 
             <div class="p-5 flex gap-4 relative">
-              <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-green-600"></div>
+              <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-slate-200 to-slate-400 {{ $l->status == 'tidak_dapat_diperbaiki' ? 'from-red-400 to-red-600' : ($l->status == 'selesai' || $l->status == 'diperbaiki' ? 'from-emerald-400 to-emerald-600' : '') }}"></div>
 
               <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-slate-100 shadow-inner mt-1">
                 <img src="{{ $l->barang->foto ? asset('storage/' . $l->barang->foto) : asset('img/no-image.png') }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Barang">
@@ -207,11 +228,11 @@
 
               <div class="flex-1 min-w-0">
                 <div class="flex justify-between items-start mb-1.5">
-                  <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[9px] font-extrabold px-2 py-0.5 rounded border border-emerald-100 uppercase tracking-wider">
+                  <span class="inline-flex items-center gap-1 {{ $badgeBg }} text-[9px] font-extrabold px-2 py-0.5 rounded border uppercase tracking-wider">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      {!! $iconPath !!}
                     </svg>
-                    Selesai
+                    {{ $statusText }}
                   </span>
                 </div>
                 <h3 class="font-extrabold text-[#1b365d] text-sm leading-tight line-clamp-2">{{ $l->barang->nama_barang }}</h3>

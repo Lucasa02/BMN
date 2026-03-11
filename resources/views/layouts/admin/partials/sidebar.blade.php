@@ -170,6 +170,18 @@
                 </ul>
             </li>
 
+            {{-- Antrean Perbaikan --}}
+            <li>
+                <a href="{{ route('admin.antrean-perbaikan.index') }}"
+                    class="nav-item flex items-center p-2.5 rounded-xl transition-all {{ request()->routeIs('admin.antrean-perbaikan.*') ? $activeClass : $inactiveClass }}">
+                    <div
+                        class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('admin.antrean-perbaikan.*') ? 'bg-blue-500' : 'bg-white/5' }} mr-1">
+                        <i class="fa-solid fa-list-check text-sm"></i>
+                    </div>
+                    <span class="ms-2 text-sm font-medium">Antrean Perbaikan</span>
+                </a>
+            </li>
+
             {{-- === USER SECTION === --}}
             <li class="pt-4 pb-2">
                 <div class="flex items-center px-3">

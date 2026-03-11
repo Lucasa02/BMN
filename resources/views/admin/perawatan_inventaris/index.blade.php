@@ -30,12 +30,15 @@
         @foreach($data as $row)
             @php
                 $statusColors = [
-                    'proses' => 'from-amber-400 to-orange-500 text-amber-950 shadow-amber-200',
                     'pending' => 'from-slate-400 to-slate-500 text-white shadow-slate-200',
+                    'proses' => 'from-amber-400 to-orange-500 text-amber-950 shadow-amber-200',
+                    'diperbaiki' => 'from-blue-400 to-indigo-500 text-white shadow-blue-200',
+                    'tidak_dapat_diperbaiki' => 'from-red-500 to-rose-600 text-white shadow-red-200',
                     'selesai' => 'from-emerald-400 to-teal-500 text-emerald-950 shadow-emerald-200',
                 ];
                 $warnaStatus = $statusColors[$row->status] ?? 'from-gray-400 to-gray-500 text-white';
                 $jenis = str_replace('_', ' ', $row->jenis_perawatan);
+                $displayStatus = str_replace('_', ' ', $row->status); // Format display status
             @endphp
 
             <div class="group bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 flex flex-col h-full transform hover:-translate-y-2">
@@ -79,7 +82,7 @@
                     {{-- Status Badge (Gradient Style) --}}
                     <div class="mb-6">
                         <span class="inline-block px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tighter bg-gradient-to-r {{ $warnaStatus }} shadow-sm">
-                            {{ $row->status }}
+                            {{ $displayStatus }}
                         </span>
                     </div>
 
@@ -92,7 +95,7 @@
                             </a>
                         @endif
 
-                        @if($row->status == 'proses')
+                        @if($row->status == 'proses' || $row->status == 'diperbaiki')
                             {{-- Form Verifikasi Selesai dengan SweetAlert --}}
                             <form action="{{ route('perawatan_inventaris.verifikasiSelesai', $row->id) }}" method="POST" class="w-full" id="form-verifikasi-{{ $row->id }}">
                                 @csrf
@@ -146,21 +149,20 @@
             icon: 'info',
             iconColor: '#10b981', // Emerald 500
             showCancelButton: true,
-            buttonsStyling: false, // Mematikan style bawaan agar tidak bentrok dengan Tailwind
+            buttonsStyling: false,
             confirmButtonText: '<i class="fa-solid fa-check-double mr-1"></i> Ya, Verifikasi',
             cancelButtonText: 'Batal',
-            reverseButtons: true, // Memindah tombol Ya ke kanan
+            reverseButtons: true,
             customClass: {
                 popup: 'rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 dark:bg-gray-800 p-6',
                 title: 'text-xl font-bold text-gray-800 dark:text-white mb-2',
                 htmlContainer: 'text-gray-500 dark:text-gray-400 text-sm',
-                actions: 'mt-6 w-full flex justify-center gap-3', // Container tombol
-                confirmButton: 'bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg', // Class Tailwind untuk Confirm
-                cancelButton: 'bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 font-semibold py-2.5 px-6 rounded-xl transition-all duration-300' // Class Tailwind untuk Cancel
+                actions: 'mt-6 w-full flex justify-center gap-3',
+                confirmButton: 'bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg',
+                cancelButton: 'bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 font-semibold py-2.5 px-6 rounded-xl transition-all duration-300'
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Submit form jika user klik 'Ya'
                 document.getElementById('form-verifikasi-' + id).submit();
             }
         });
@@ -172,9 +174,9 @@
             title: 'Ajukan Penghapusan BMN?',
             html: "Barang ini akan dipindahkan ke daftar <b>Rencana Penghapusan</b>.<br>Tindakan ini memerlukan persetujuan lebih lanjut.",
             icon: 'warning',
-            iconColor: '#ef4444', // Red 500
+            iconColor: '#ef4444',
             showCancelButton: true,
-            buttonsStyling: false, // Mematikan style bawaan agar tidak bentrok dengan Tailwind
+            buttonsStyling: false,
             confirmButtonText: '<i class="fa-solid fa-trash-can mr-1"></i> Ya, Ajukan',
             cancelButtonText: 'Batal',
             reverseButtons: true,
@@ -183,12 +185,11 @@
                 title: 'text-xl font-bold text-gray-800 dark:text-white mb-2',
                 htmlContainer: 'text-gray-500 dark:text-gray-400 text-sm',
                 actions: 'mt-6 w-full flex justify-center gap-3',
-                confirmButton: 'bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg', // Class Tailwind untuk Confirm
-                cancelButton: 'bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 font-semibold py-2.5 px-6 rounded-xl transition-all duration-300' // Class Tailwind untuk Cancel
+                confirmButton: 'bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg',
+                cancelButton: 'bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 font-semibold py-2.5 px-6 rounded-xl transition-all duration-300'
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Redirect ke URL penghapusan jika user klik 'Ya'
                 window.location.href = url;
             }
         });

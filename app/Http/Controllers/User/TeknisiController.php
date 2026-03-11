@@ -38,9 +38,10 @@ class TeknisiController extends Controller
     public function perbaikanSubmit(Request $request, $uuid)
     {
         $request->validate([
-            'deskripsi'  => 'required',
-            'biaya'      => 'required|numeric',
-            'foto_bukti' => 'nullable|image|max:4096'
+            'deskripsi'        => 'required',
+            'biaya'            => 'required|numeric',
+            'status_perbaikan' => 'required|in:diperbaiki,tidak_dapat_diperbaiki',
+            'foto_bukti'       => 'nullable|image|max:4096'
         ]);
 
         $laporan = LaporanKerusakan::where('uuid', $uuid)->firstOrFail();
@@ -56,11 +57,11 @@ class TeknisiController extends Controller
             'user_id'           => Auth::id(),
             'tanggal_perawatan' => now(),
             'jenis_perawatan'   => 'perbaikan',
-            'deskripsi'         => "Keluhan: " . $laporan->deskripsi . "\nTindakan Teknisi: " . $request->deskripsi,
+            'deskripsi'         => "Keluhan: " . $laporan->deskripsi . "\nTindakan Perbaikan: " . $request->deskripsi,
             'biaya'             => $request->biaya,
             'foto_bukti'        => $fotoPath,
             'foto_kerusakan'    => $laporan->foto,
-            'status'            => 'proses'
+            'status'            => $request->status_perbaikan // Menyimpan hasil radio button
         ]);
 
         $laporan->delete();
@@ -73,7 +74,7 @@ class TeknisiController extends Controller
         $query = PerawatanInventaris::with(['barang'])
             ->where('user_id', Auth::id())
             ->where('jenis_perawatan', 'perbaikan')
-            ->whereIn('status', ['proses', 'selesai']);
+            ->whereIn('status', ['proses', 'diperbaiki', 'tidak_dapat_diperbaiki', 'selesai']);
 
         $periodeText = 'Semua Waktu';
 
@@ -106,11 +107,10 @@ class TeknisiController extends Controller
         $query = PerawatanInventaris::with(['barang'])
             ->where('user_id', Auth::id())
             ->where('jenis_perawatan', 'perbaikan')
-            ->whereIn('status', ['proses', 'selesai']);
+            ->whereIn('status', ['proses', 'diperbaiki', 'tidak_dapat_diperbaiki', 'selesai']);
 
         $periodeText = 'Semua Waktu';
 
-        // Terapkan filter yang sama persis seperti di tampilan logbook
         if ($request->filled('filter_month')) {
             $date = Carbon::parse($request->filter_month);
             $query->whereYear('updated_at', $date->year)

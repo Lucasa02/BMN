@@ -37,7 +37,7 @@ class JabatanSeeder extends Seeder
 
         Jabatan::create([
             'uuid' => Str::uuid(),
-            'jabatan' => 'Petugas Teknisi',
+            'jabatan' => 'Petugas Perbaikan',
             'created_at' => now(),
             'updated_at' => now()
         ]);

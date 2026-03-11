@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\BmnController;
 use App\Http\Controllers\Admin\RencanaPenghapusanController;
 use App\Http\Controllers\Admin\DataPenghapusanController;
 use App\Http\Controllers\Admin\LaporanKerusakanAdminController;
+use App\Http\Controllers\Admin\AntreanPerbaikanController;
 
 use App\Http\Controllers\User\PeminjamanController as UserPeminjamanController;
 use App\Http\Controllers\User\PeminjamanController as PeminjamanUser;
@@ -200,7 +201,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('admin/bmn')->middleware(['auth', 'verified.password', 'role:superadmin,admin'])->group(function () {
 
-      // --- ROUTES BARU DARI GAMBAR ---
       // Route untuk Ruangan BMN
       Route::prefix('ruangan')->group(function () {
         Route::get('/', [BmnController::class, 'ruanganIndex'])->name('bmn.ruangan.index');
@@ -271,7 +271,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Route Profil (Akses untuk User & Teknisi)
-Route::middleware(['auth', 'role:user,teknisi'])->group(function () {
+Route::middleware(['auth', 'role:user,tim_perbaikan'])->group(function () {
   Route::get('user/profil', [OptionsController::class, 'profil'])->name('user.profil');
   Route::patch('user/profil/update', [OptionsController::class, 'updateProfil'])->name('user.profil.update');
 });
@@ -302,6 +302,9 @@ Route::middleware(['role:user'])->group(function () {
 });
 
 Route::prefix('admin')->group(function () {
+  Route::get('/antrean-perbaikan', [AntreanPerbaikanController::class, 'index'])->name('admin.antrean-perbaikan.index');
+  Route::get('/antrean-perbaikan/logbook', [AntreanPerbaikanController::class, 'logbook'])->name('admin.antrean-perbaikan.logbook');
+  Route::get('/antrean-perbaikan/{uuid}/detail', [AntreanPerbaikanController::class, 'detail'])->name('admin.antrean-perbaikan.detail');
   Route::prefix('perawatan')->name('perawatan_inventaris.')->group(function () {
     Route::get('/', [PerawatanInventarisController::class, 'index'])->name('index');
     Route::post('/masuk/{barang_id}', [PerawatanInventarisController::class, 'storeFromBarang'])->name('storeFromBarang');
@@ -333,13 +336,13 @@ Route::prefix('user')->group(function () {
     Route::get('/inventaris/qr/download', [InventarisUserController::class, 'downloadAllQR'])->name('user.inventaris.qr.download');
   });
 
-  Route::middleware(['auth', 'role:user,teknisi'])->group(function () {
+  Route::middleware(['auth', 'role:user,tim_perbaikan'])->group(function () {
     Route::get('/inventaris/{id}/lapor-kerusakan', [LaporanKerusakanController::class, 'form'])->name('user.inventaris.lapor-kerusakan.form');
     Route::post('/inventaris/lapor-kerusakan/store', [LaporanKerusakanController::class, 'store'])->name('user.inventaris.lapor-kerusakan.store');
   });
 });
 
-Route::prefix('user/teknisi')->middleware(['auth', 'role:teknisi'])->name('user.teknisi.')->group(function () {
+Route::prefix('user/teknisi')->middleware(['auth', 'role:tim_perbaikan'])->name('user.teknisi.')->group(function () {
     Route::get('/', [TeknisiController::class, 'index'])->name('index');
     Route::get('/detail/{uuid}', [TeknisiController::class, 'detail'])->name('detail');
     Route::get('/perbaikan/{uuid}', [TeknisiController::class, 'perbaikan'])->name('perbaikan');

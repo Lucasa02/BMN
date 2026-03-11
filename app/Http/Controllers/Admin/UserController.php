@@ -26,7 +26,7 @@ class UserController extends Controller
 		$query = User::query();
 
 		if ($currentUser->role !== 'superadmin') {
-			$query->whereIn('role', ['admin', 'user', 'teknisi']);
+			$query->whereIn('role', ['admin', 'user', 'tim_perbaikan']);
 		}
 
 		$data = [
@@ -81,14 +81,14 @@ class UserController extends Controller
       ]
     );
 
-    // LOGIKA PENENTUAN JABATAN OTOMATIS BERDASARKAN ROLE
-    if ($request->role === 'teknisi') {
-        $jabatanUser = Jabatan::where('jabatan', 'Petugas Teknisi')->first();
-        $namaJabatanError = 'Petugas Teknisi';
-    } else {
-        $jabatanUser = Jabatan::where('jabatan', 'Petugas Inventaris')->first();
-        $namaJabatanError = 'Petugas Inventaris';
-    }
+    if ($request->role === 'tim_perbaikan') {
+    // Ubah pencarian menjadi 'Petugas Perbaikan' sesuai dengan Seeder
+    $jabatanUser = Jabatan::where('jabatan', 'Petugas Perbaikan')->first();
+    $namaJabatanError = 'Petugas Perbaikan';
+} else {
+    $jabatanUser = Jabatan::where('jabatan', 'Petugas Inventaris')->first();
+    $namaJabatanError = 'Petugas Inventaris';
+}
 
     // Pengecekan apakah jabatan ada di database
     if (!$jabatanUser) {

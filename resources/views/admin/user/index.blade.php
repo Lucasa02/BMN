@@ -7,7 +7,7 @@
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white tracking-tight">Manajemen Pengguna</h1>
             <p class="text-sm text-gray-500 dark:text-gray-400">Kelola dan pantau seluruh kredensial pengguna sistem Anda.</p>
         </div>
-        
+
         <div class="flex items-center space-x-3">
             @if (in_array(Route::currentRouteName(), ['users.search', 'users.jabatan']))
                 <a href="{{ route('users.index') }}"
@@ -90,11 +90,12 @@
                                     $roleColor = [
                                         'superadmin' => 'bg-purple-100 text-purple-700 ring-purple-600/20',
                                         'admin' => 'bg-blue-100 text-blue-700 ring-blue-600/20',
+                                        'tim_perbaikan' => 'bg-indigo-100 text-indigo-700 ring-indigo-600/20',
                                         'user' => 'bg-gray-100 text-gray-700 ring-gray-600/20'
                                     ][$row->role] ?? 'bg-gray-100 text-gray-700';
                                 @endphp
                                 <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold ring-1 ring-inset {{ $roleColor }}">
-                                    {{ ucfirst($row->role) }}
+                                    {{ $row->role == 'tim_perbaikan' ? 'Tim Perbaikan' : ucfirst($row->role) }}
                                 </span>
                             </td>
                             @endif
@@ -105,13 +106,13 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <a href="{{ route('users.show', $row->uuid) }}" 
+                                    <a href="{{ route('users.show', $row->uuid) }}"
                                        class="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all shadow-sm" title="Detail">
                                         <i class="fas fa-info-circle text-sm"></i>
                                     </a>
 
                                     @if (Auth::user()->role == 'superadmin')
-                                        <a href="{{ route('users.edit', $row->uuid) }}" 
+                                        <a href="{{ route('users.edit', $row->uuid) }}"
                                            class="p-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-600 hover:text-white transition-all shadow-sm" title="Ubah">
                                             <i class="fas fa-edit text-sm"></i>
                                         </a>
@@ -133,7 +134,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="px-6 py-4 bg-gray-50/50 dark:bg-gray-700/50 border-t border-gray-100 dark:border-gray-700">
                 {{ $user->links() }}
             </div>
@@ -149,15 +150,15 @@
             </div>
             <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">Hapus Data Pengguna?</h3>
             <p class="mb-8 text-gray-500 text-sm">Tindakan ini tidak dapat dibatalkan. Semua data terkait user ini akan terhapus permanen.</p>
-            
+
             <div class="flex justify-center space-x-3">
-                <button data-modal-hide="delete-modal" type="button" 
+                <button data-modal-hide="delete-modal" type="button"
                         class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all">
                     Batal
                 </button>
                 <form id="deleteForm" method="POST">
                     @csrf @method('DELETE')
-                    <button type="submit" 
+                    <button type="submit"
                             class="px-6 py-2.5 text-sm font-semibold text-white bg-rose-600 rounded-xl hover:bg-rose-700 shadow-lg shadow-rose-200 transition-all">
                         Ya, Hapus Data
                     </button>

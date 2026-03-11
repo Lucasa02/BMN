@@ -81,7 +81,7 @@
                             @endif
                             <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                             <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
-                            <option value="teknisi" {{ old('role') == 'teknisi' ? 'selected' : '' }}>Teknisi</option>
+                            <option value="tim_perbaikan" {{ old('role') == 'tim_perbaikan' ? 'selected' : '' }}>Tim Perbaikan</option>
                         </select>
                         @error('role')
                             <p class="text-red-500 text-xs mt-1 italic">{{ $message }}</p>
@@ -142,19 +142,19 @@
 @section('scripts')
 <script>
     function togglePasswordVisibility() {
-        const roleSelect = document.getElementById("role");
-        const passwordContainer = document.getElementById("passwordContainer");
-        const passwordInput = document.getElementById("password");
+    const roleSelect = document.getElementById("role");
+    const passwordContainer = document.getElementById("passwordContainer");
+    const passwordInput = document.getElementById("password");
 
-        // Teknisi ditambahkan ke validasi jika mereka memerlukan password untuk login seperti admin
-        if (roleSelect.value === "superadmin" || roleSelect.value === "admin" || roleSelect.value === "teknisi") {
-            passwordContainer.classList.remove("hidden");
-            passwordInput.setAttribute("required", "required");
-        } else {
-            passwordContainer.classList.add("hidden");
-            passwordInput.removeAttribute("required");
-        }
+    // Ubah pengecekan value menjadi tim_perbaikan
+    if (roleSelect.value === "superadmin" || roleSelect.value === "admin" || roleSelect.value === "tim_perbaikan") {
+        passwordContainer.classList.remove("hidden");
+        passwordInput.setAttribute("required", "required");
+    } else {
+        passwordContainer.classList.add("hidden");
+        passwordInput.removeAttribute("required");
     }
+}
 
     document.getElementById("role").addEventListener("change", togglePasswordVisibility);
     window.onload = togglePasswordVisibility;

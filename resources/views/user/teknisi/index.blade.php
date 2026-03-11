@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <link rel="shortcut icon" href="{{ asset('img/assets/bg_esimba.png') }}" type="image/x-icon" />
   <link href="https://fonts.cdnfonts.com/css/avenir" rel="stylesheet" />
-  <title>Dashboard Teknisi | BMN</title>
+  <title>Dashboard Tim Perbaikan | BMN</title>
 
   @notifyCss
   @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -154,7 +154,7 @@
     <section class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16 lg:pt-20 lg:pb-24 flex flex-col items-center text-center animate-fade-in-up">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-blue-100 text-xs font-semibold uppercase tracking-widest mb-6">
         <span class="w-2 h-2 rounded-full bg-[#d4af37] animate-pulse"></span>
-        Portal Teknisi BMN
+        Portal Tim Perbaikan BMN
       </div>
 
       <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight drop-shadow-md">
@@ -193,7 +193,7 @@
             </svg>
             Antrean Perbaikan
           </h2>
-          <p class="text-sm text-slate-500 mt-1 font-medium">Daftar inventaris yang menunggu tindakan teknisi.</p>
+          <p class="text-sm text-slate-500 mt-1 font-medium">Daftar inventaris yang menunggu tindakan perbaikan.</p>
         </div>
         <div class="bg-[#1b365d]/5 border border-[#1b365d]/10 px-4 py-2 rounded-lg flex items-center gap-2">
           <span class="relative flex h-3 w-3">

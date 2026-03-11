@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('barang_id');
             $table->foreign('barang_id')->references('id')->on('bmn_barangs')->onDelete('cascade');
 
-            // TAMBAHAN BARU: Menyimpan ID Teknisi/User yang memperbaiki
+            // Menyimpan ID Teknisi/User yang memperbaiki
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
 
             $table->date('tanggal_perawatan')->nullable();
@@ -29,8 +29,14 @@ return new class extends Migration
 
             $table->text('deskripsi')->nullable();
 
-            $table->enum('status', ['proses', 'pending', 'selesai'])
-                  ->default('proses');
+            // PERBAIKAN: Tambahkan 'diperbaiki' dan 'tidak_dapat_diperbaiki' ke dalam ENUM
+            $table->enum('status', [
+                'pending',
+                'proses',
+                'diperbaiki',
+                'tidak_dapat_diperbaiki',
+                'selesai'
+            ])->default('proses');
 
             $table->integer('biaya')->nullable();
 

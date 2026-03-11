@@ -77,15 +77,16 @@ class AuthController extends Controller
             ? route('user.inventaris')
             : route('user.option')
         );
-      } elseif ($user->role == 'teknisi') {
+      } elseif ($user->role == 'tim_perbaikan') {
 
-        // TAMBAHKAN BLOK INI UNTUK TEKNISI
+        // TAMBAHKAN BLOK INI UNTUK TIM PERBAIKAN
         notify()->success('Login Berhasil, Selamat Datang ' . $user->nama_lengkap);
+
         return redirect()->route('user.teknisi.index');
 
       }
-		}
-		return redirect()->back()->with('error', 'Kode user tidak terdaftar !');
+    }
+    return redirect()->back()->with('error', 'Kode user tidak terdaftar !');
 	}
 
 	public function passwordValidation(Request $request)

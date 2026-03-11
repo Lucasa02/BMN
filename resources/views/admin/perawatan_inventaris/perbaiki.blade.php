@@ -9,7 +9,7 @@
             </div>
             <div>
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Tulis Keluhan Aset</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Deskripsikan masalah sebelum mengirimkannya ke Teknisi.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Deskripsikan masalah sebelum mengirimkannya ke Tim Perbaikan  .</p>
             </div>
         </div>
 
@@ -54,7 +54,7 @@
                 </a>
                 <button type="submit"
                         class="flex-1 px-8 py-3.5 bg-[#1b365d] text-white rounded-xl font-bold hover:bg-blue-900 shadow-xl shadow-blue-900/20 transition-all text-sm flex justify-center items-center gap-2">
-                    Teruskan ke Teknisi <i class="fa-solid fa-paper-plane"></i>
+                    Teruskan ke Tim Perbaikan <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
         </form>

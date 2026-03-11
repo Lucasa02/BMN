@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lengkapi Data Perbaikan - Teknisi | BMN</title>
+    <title>Lengkapi Data Perbaikan | BMN</title>
     @notifyCss
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -142,7 +142,7 @@
                             class="form-input-premium resize-none"></textarea>
                     </div>
 
-                    {{-- Biaya (PERBAIKAN INPUT NOMINAL) --}}
+                    {{-- Biaya --}}
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-widest text-[#1b365d] mb-2.5">
                             Total Biaya Perbaikan
@@ -151,6 +151,30 @@
                             <span class="pl-5 pr-2 py-3 text-slate-500 font-bold text-sm select-none border-r border-[#e2e8f0]/50 bg-slate-100/50">Rp</span>
                             <input type="number" name="biaya" required placeholder="0" min="0"
                                 class="w-full bg-transparent border-none focus:ring-0 p-3.5 text-sm font-medium text-slate-800" style="box-shadow: none;">
+                        </div>
+                    </div>
+
+                    {{-- Status Hasil Perbaikan (Penambahan Radio Button) --}}
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-[#1b365d] mb-2.5">
+                            Status Hasil Perbaikan
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <label class="relative flex items-start p-4 border border-[#e2e8f0] rounded-2xl cursor-pointer hover:bg-slate-50 transition-all focus-within:ring-2 focus-within:ring-[#1b365d] focus-within:border-[#1b365d]">
+                                <input type="radio" name="status_perbaikan" value="diperbaiki" class="mt-1 w-5 h-5 text-[#1b365d] border-slate-300 focus:ring-[#1b365d]" required checked>
+                                <span class="ml-3">
+                                    <span class="block text-sm font-bold text-slate-800">Dapat Diperbaiki</span>
+                                    <span class="block text-xs text-slate-500 mt-1">Barang berhasil diperbaiki dan siap untuk diverifikasi.</span>
+                                </span>
+                            </label>
+
+                            <label class="relative flex items-start p-4 border border-[#e2e8f0] rounded-2xl cursor-pointer hover:bg-red-50 transition-all focus-within:ring-2 focus-within:ring-red-500 focus-within:border-red-500">
+                                <input type="radio" name="status_perbaikan" value="tidak_dapat_diperbaiki" class="mt-1 w-5 h-5 text-red-500 border-slate-300 focus:ring-red-500" required>
+                                <span class="ml-3">
+                                    <span class="block text-sm font-bold text-slate-800">Tidak Dapat Diperbaiki</span>
+                                    <span class="block text-xs text-slate-500 mt-1">Kerusakan terlalu parah, disarankan untuk penghapusan.</span>
+                                </span>
+                            </label>
                         </div>
                     </div>
 
